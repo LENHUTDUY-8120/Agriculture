@@ -1,0 +1,67 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233616",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "task",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "endDate",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "Task entity.\\n@author The JHipster team.",
+  "jpaMetamodelFiltering": false,
+  "name": "Task",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "season",
+      "relationshipName": "season",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "employee",
+      "otherEntityRelationshipName": "task",
+      "ownerSide": true,
+      "relationshipName": "employee",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "supplies",
+      "otherEntityRelationshipName": "task",
+      "ownerSide": true,
+      "relationshipName": "supplies",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "protectionProduct",
+      "otherEntityRelationshipName": "task",
+      "ownerSide": true,
+      "relationshipName": "protectionproduct",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "fertilizers",
+      "otherEntityRelationshipName": "task",
+      "ownerSide": true,
+      "relationshipName": "fertilizers",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceImpl"
+}

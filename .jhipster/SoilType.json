@@ -1,0 +1,24 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233607",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "soil_type",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descriptions",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "SoilType",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceImpl"
+}

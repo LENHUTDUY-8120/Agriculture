@@ -1,0 +1,62 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233606",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "season",
+  "fields": [
+    {
+      "fieldName": "crops",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "totalCost",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "cropYields",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "unit",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "done",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "startAt",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "endAt",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Season",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "transaction",
+      "otherEntityRelationshipName": "season",
+      "relationshipName": "transaction",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "crops",
+      "relationshipName": "crop",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "field",
+      "otherEntityRelationshipName": "season",
+      "relationshipName": "field",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

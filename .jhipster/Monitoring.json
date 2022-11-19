@@ -1,0 +1,35 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233605",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "monitoring",
+  "fields": [
+    {
+      "fieldName": "dataJson",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Monitoring",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "field",
+      "relationshipName": "field",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "device",
+      "relationshipName": "device",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

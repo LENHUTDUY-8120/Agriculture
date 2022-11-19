@@ -1,0 +1,66 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233604",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "field",
+  "fields": [
+    {
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "geoJson",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "area",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "descriptions",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "enable",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "latitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "longitude",
+      "fieldType": "Double"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Field",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "season",
+      "otherEntityRelationshipName": "field",
+      "relationshipName": "season",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "device",
+      "otherEntityRelationshipName": "field",
+      "relationshipName": "device",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "soilType",
+      "relationshipName": "soil",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

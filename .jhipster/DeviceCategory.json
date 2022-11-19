@@ -1,0 +1,24 @@
+{
+  "applications": "*",
+  "changelogDate": "20221118233613",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "device_category",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "DeviceCategory",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceImpl"
+}

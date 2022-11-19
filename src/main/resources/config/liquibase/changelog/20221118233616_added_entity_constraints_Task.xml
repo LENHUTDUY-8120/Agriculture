@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity Task.
+    -->
+    <changeSet id="20221118233616-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="season_id"
+                                 baseTableName="task"
+                                 constraintName="fk_task__season_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="season"/>
+
+        <addForeignKeyConstraint baseColumnNames="task_id"
+                                 baseTableName="rel_task__employee"
+                                 constraintName="fk_rel_task__employee__task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"/>
+
+        <addForeignKeyConstraint baseColumnNames="employee_id"
+                                 baseTableName="rel_task__employee"
+                                 constraintName="fk_rel_task__employee__employee_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="employee"/>
+
+        <addForeignKeyConstraint baseColumnNames="task_id"
+                                 baseTableName="rel_task__supplies"
+                                 constraintName="fk_rel_task__supplies__task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"/>
+
+        <addForeignKeyConstraint baseColumnNames="supplies_id"
+                                 baseTableName="rel_task__supplies"
+                                 constraintName="fk_rel_task__supplies__supplies_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="supplies"/>
+
+        <addForeignKeyConstraint baseColumnNames="task_id"
+                                 baseTableName="rel_task__protectionproduct"
+                                 constraintName="fk_rel_task__protectionproduct__task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"/>
+
+        <addForeignKeyConstraint baseColumnNames="protectionproduct_id"
+                                 baseTableName="rel_task__protectionproduct"
+                                 constraintName="fk_rel_task__protectionproduct__protectionproduct_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="protection_product"/>
+
+        <addForeignKeyConstraint baseColumnNames="task_id"
+                                 baseTableName="rel_task__fertilizers"
+                                 constraintName="fk_rel_task__fertilizers__task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"/>
+
+        <addForeignKeyConstraint baseColumnNames="fertilizers_id"
+                                 baseTableName="rel_task__fertilizers"
+                                 constraintName="fk_rel_task__fertilizers__fertilizers_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="fertilizers"/>
+    </changeSet>
+</databaseChangeLog>
