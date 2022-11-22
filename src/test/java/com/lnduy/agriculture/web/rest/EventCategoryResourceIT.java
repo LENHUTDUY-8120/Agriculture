@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.lnduy.agriculture.IntegrationTest;
 import com.lnduy.agriculture.domain.EventCategory;
 import com.lnduy.agriculture.repository.EventCategoryRepository;
+import com.lnduy.agriculture.service.criteria.EventCategoryCriteria;
 import com.lnduy.agriculture.service.dto.EventCategoryDTO;
 import com.lnduy.agriculture.service.mapper.EventCategoryMapper;
 import java.util.List;
@@ -149,6 +150,127 @@ class EventCategoryResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(eventCategory.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+    }
+
+    @Test
+    @Transactional
+    void getEventCategoriesByIdFiltering() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        Long id = eventCategory.getId();
+
+        defaultEventCategoryShouldBeFound("id.equals=" + id);
+        defaultEventCategoryShouldNotBeFound("id.notEquals=" + id);
+
+        defaultEventCategoryShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultEventCategoryShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultEventCategoryShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultEventCategoryShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllEventCategoriesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        // Get all the eventCategoryList where name equals to DEFAULT_NAME
+        defaultEventCategoryShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the eventCategoryList where name equals to UPDATED_NAME
+        defaultEventCategoryShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEventCategoriesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        // Get all the eventCategoryList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultEventCategoryShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the eventCategoryList where name equals to UPDATED_NAME
+        defaultEventCategoryShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEventCategoriesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        // Get all the eventCategoryList where name is not null
+        defaultEventCategoryShouldBeFound("name.specified=true");
+
+        // Get all the eventCategoryList where name is null
+        defaultEventCategoryShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEventCategoriesByNameContainsSomething() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        // Get all the eventCategoryList where name contains DEFAULT_NAME
+        defaultEventCategoryShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the eventCategoryList where name contains UPDATED_NAME
+        defaultEventCategoryShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEventCategoriesByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        eventCategoryRepository.saveAndFlush(eventCategory);
+
+        // Get all the eventCategoryList where name does not contain DEFAULT_NAME
+        defaultEventCategoryShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the eventCategoryList where name does not contain UPDATED_NAME
+        defaultEventCategoryShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultEventCategoryShouldBeFound(String filter) throws Exception {
+        restEventCategoryMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(eventCategory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+
+        // Check, that the count call also returns 1
+        restEventCategoryMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultEventCategoryShouldNotBeFound(String filter) throws Exception {
+        restEventCategoryMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restEventCategoryMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface DeviceCategoryRepository extends JpaRepository<DeviceCategory, Long> {}
+public interface DeviceCategoryRepository extends JpaRepository<DeviceCategory, Long>, JpaSpecificationExecutor<DeviceCategory> {}

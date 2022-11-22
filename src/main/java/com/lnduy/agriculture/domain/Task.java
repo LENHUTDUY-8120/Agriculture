@@ -29,6 +29,9 @@ public class Task implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "enable")
+    private Integer enable;
+
     @Column(name = "start_date")
     private ZonedDateTime startDate;
 
@@ -54,7 +57,7 @@ public class Task implements Serializable {
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "supplies_id")
     )
-    @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "warehouse", "tasks" }, allowSetters = true)
     private Set<Supplies> supplies = new HashSet<>();
 
     @ManyToMany
@@ -63,7 +66,7 @@ public class Task implements Serializable {
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "protectionproduct_id")
     )
-    @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "warehouse", "tasks" }, allowSetters = true)
     private Set<ProtectionProduct> protectionproducts = new HashSet<>();
 
     @ManyToMany
@@ -72,7 +75,7 @@ public class Task implements Serializable {
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "fertilizers_id")
     )
-    @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "warehouse", "tasks" }, allowSetters = true)
     private Set<Fertilizers> fertilizers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -114,6 +117,19 @@ public class Task implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getEnable() {
+        return this.enable;
+    }
+
+    public Task enable(Integer enable) {
+        this.setEnable(enable);
+        return this;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
     }
 
     public ZonedDateTime getStartDate() {
@@ -281,6 +297,7 @@ public class Task implements Serializable {
             "id=" + getId() +
             ", title='" + getTitle() + "'" +
             ", description='" + getDescription() + "'" +
+            ", enable=" + getEnable() +
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
             "}";

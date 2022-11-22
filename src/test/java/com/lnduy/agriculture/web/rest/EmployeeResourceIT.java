@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.lnduy.agriculture.IntegrationTest;
 import com.lnduy.agriculture.domain.Employee;
+import com.lnduy.agriculture.domain.Task;
 import com.lnduy.agriculture.repository.EmployeeRepository;
+import com.lnduy.agriculture.service.criteria.EmployeeCriteria;
 import com.lnduy.agriculture.service.dto.EmployeeDTO;
 import com.lnduy.agriculture.service.mapper.EmployeeMapper;
 import java.time.Instant;
@@ -50,12 +52,15 @@ class EmployeeResourceIT {
 
     private static final Long DEFAULT_SALARY = 1L;
     private static final Long UPDATED_SALARY = 2L;
+    private static final Long SMALLER_SALARY = 1L - 1L;
 
     private static final Long DEFAULT_COMMISSION_PCT = 1L;
     private static final Long UPDATED_COMMISSION_PCT = 2L;
+    private static final Long SMALLER_COMMISSION_PCT = 1L - 1L;
 
     private static final Integer DEFAULT_ENABLE = 1;
     private static final Integer UPDATED_ENABLE = 2;
+    private static final Integer SMALLER_ENABLE = 1 - 1;
 
     private static final String ENTITY_API_URL = "/api/employees";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -205,6 +210,664 @@ class EmployeeResourceIT {
             .andExpect(jsonPath("$.salary").value(DEFAULT_SALARY.intValue()))
             .andExpect(jsonPath("$.commissionPct").value(DEFAULT_COMMISSION_PCT.intValue()))
             .andExpect(jsonPath("$.enable").value(DEFAULT_ENABLE));
+    }
+
+    @Test
+    @Transactional
+    void getEmployeesByIdFiltering() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        Long id = employee.getId();
+
+        defaultEmployeeShouldBeFound("id.equals=" + id);
+        defaultEmployeeShouldNotBeFound("id.notEquals=" + id);
+
+        defaultEmployeeShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultEmployeeShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultEmployeeShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultEmployeeShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByFirstNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where firstName equals to DEFAULT_FIRST_NAME
+        defaultEmployeeShouldBeFound("firstName.equals=" + DEFAULT_FIRST_NAME);
+
+        // Get all the employeeList where firstName equals to UPDATED_FIRST_NAME
+        defaultEmployeeShouldNotBeFound("firstName.equals=" + UPDATED_FIRST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByFirstNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where firstName in DEFAULT_FIRST_NAME or UPDATED_FIRST_NAME
+        defaultEmployeeShouldBeFound("firstName.in=" + DEFAULT_FIRST_NAME + "," + UPDATED_FIRST_NAME);
+
+        // Get all the employeeList where firstName equals to UPDATED_FIRST_NAME
+        defaultEmployeeShouldNotBeFound("firstName.in=" + UPDATED_FIRST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByFirstNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where firstName is not null
+        defaultEmployeeShouldBeFound("firstName.specified=true");
+
+        // Get all the employeeList where firstName is null
+        defaultEmployeeShouldNotBeFound("firstName.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByFirstNameContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where firstName contains DEFAULT_FIRST_NAME
+        defaultEmployeeShouldBeFound("firstName.contains=" + DEFAULT_FIRST_NAME);
+
+        // Get all the employeeList where firstName contains UPDATED_FIRST_NAME
+        defaultEmployeeShouldNotBeFound("firstName.contains=" + UPDATED_FIRST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByFirstNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where firstName does not contain DEFAULT_FIRST_NAME
+        defaultEmployeeShouldNotBeFound("firstName.doesNotContain=" + DEFAULT_FIRST_NAME);
+
+        // Get all the employeeList where firstName does not contain UPDATED_FIRST_NAME
+        defaultEmployeeShouldBeFound("firstName.doesNotContain=" + UPDATED_FIRST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByLastNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where lastName equals to DEFAULT_LAST_NAME
+        defaultEmployeeShouldBeFound("lastName.equals=" + DEFAULT_LAST_NAME);
+
+        // Get all the employeeList where lastName equals to UPDATED_LAST_NAME
+        defaultEmployeeShouldNotBeFound("lastName.equals=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByLastNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where lastName in DEFAULT_LAST_NAME or UPDATED_LAST_NAME
+        defaultEmployeeShouldBeFound("lastName.in=" + DEFAULT_LAST_NAME + "," + UPDATED_LAST_NAME);
+
+        // Get all the employeeList where lastName equals to UPDATED_LAST_NAME
+        defaultEmployeeShouldNotBeFound("lastName.in=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByLastNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where lastName is not null
+        defaultEmployeeShouldBeFound("lastName.specified=true");
+
+        // Get all the employeeList where lastName is null
+        defaultEmployeeShouldNotBeFound("lastName.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByLastNameContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where lastName contains DEFAULT_LAST_NAME
+        defaultEmployeeShouldBeFound("lastName.contains=" + DEFAULT_LAST_NAME);
+
+        // Get all the employeeList where lastName contains UPDATED_LAST_NAME
+        defaultEmployeeShouldNotBeFound("lastName.contains=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByLastNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where lastName does not contain DEFAULT_LAST_NAME
+        defaultEmployeeShouldNotBeFound("lastName.doesNotContain=" + DEFAULT_LAST_NAME);
+
+        // Get all the employeeList where lastName does not contain UPDATED_LAST_NAME
+        defaultEmployeeShouldBeFound("lastName.doesNotContain=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEmailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where email equals to DEFAULT_EMAIL
+        defaultEmployeeShouldBeFound("email.equals=" + DEFAULT_EMAIL);
+
+        // Get all the employeeList where email equals to UPDATED_EMAIL
+        defaultEmployeeShouldNotBeFound("email.equals=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEmailIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where email in DEFAULT_EMAIL or UPDATED_EMAIL
+        defaultEmployeeShouldBeFound("email.in=" + DEFAULT_EMAIL + "," + UPDATED_EMAIL);
+
+        // Get all the employeeList where email equals to UPDATED_EMAIL
+        defaultEmployeeShouldNotBeFound("email.in=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEmailIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where email is not null
+        defaultEmployeeShouldBeFound("email.specified=true");
+
+        // Get all the employeeList where email is null
+        defaultEmployeeShouldNotBeFound("email.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEmailContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where email contains DEFAULT_EMAIL
+        defaultEmployeeShouldBeFound("email.contains=" + DEFAULT_EMAIL);
+
+        // Get all the employeeList where email contains UPDATED_EMAIL
+        defaultEmployeeShouldNotBeFound("email.contains=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEmailNotContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where email does not contain DEFAULT_EMAIL
+        defaultEmployeeShouldNotBeFound("email.doesNotContain=" + DEFAULT_EMAIL);
+
+        // Get all the employeeList where email does not contain UPDATED_EMAIL
+        defaultEmployeeShouldBeFound("email.doesNotContain=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByPhoneNumberIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where phoneNumber equals to DEFAULT_PHONE_NUMBER
+        defaultEmployeeShouldBeFound("phoneNumber.equals=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the employeeList where phoneNumber equals to UPDATED_PHONE_NUMBER
+        defaultEmployeeShouldNotBeFound("phoneNumber.equals=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByPhoneNumberIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where phoneNumber in DEFAULT_PHONE_NUMBER or UPDATED_PHONE_NUMBER
+        defaultEmployeeShouldBeFound("phoneNumber.in=" + DEFAULT_PHONE_NUMBER + "," + UPDATED_PHONE_NUMBER);
+
+        // Get all the employeeList where phoneNumber equals to UPDATED_PHONE_NUMBER
+        defaultEmployeeShouldNotBeFound("phoneNumber.in=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByPhoneNumberIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where phoneNumber is not null
+        defaultEmployeeShouldBeFound("phoneNumber.specified=true");
+
+        // Get all the employeeList where phoneNumber is null
+        defaultEmployeeShouldNotBeFound("phoneNumber.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByPhoneNumberContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where phoneNumber contains DEFAULT_PHONE_NUMBER
+        defaultEmployeeShouldBeFound("phoneNumber.contains=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the employeeList where phoneNumber contains UPDATED_PHONE_NUMBER
+        defaultEmployeeShouldNotBeFound("phoneNumber.contains=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByPhoneNumberNotContainsSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where phoneNumber does not contain DEFAULT_PHONE_NUMBER
+        defaultEmployeeShouldNotBeFound("phoneNumber.doesNotContain=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the employeeList where phoneNumber does not contain UPDATED_PHONE_NUMBER
+        defaultEmployeeShouldBeFound("phoneNumber.doesNotContain=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByHireDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where hireDate equals to DEFAULT_HIRE_DATE
+        defaultEmployeeShouldBeFound("hireDate.equals=" + DEFAULT_HIRE_DATE);
+
+        // Get all the employeeList where hireDate equals to UPDATED_HIRE_DATE
+        defaultEmployeeShouldNotBeFound("hireDate.equals=" + UPDATED_HIRE_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByHireDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where hireDate in DEFAULT_HIRE_DATE or UPDATED_HIRE_DATE
+        defaultEmployeeShouldBeFound("hireDate.in=" + DEFAULT_HIRE_DATE + "," + UPDATED_HIRE_DATE);
+
+        // Get all the employeeList where hireDate equals to UPDATED_HIRE_DATE
+        defaultEmployeeShouldNotBeFound("hireDate.in=" + UPDATED_HIRE_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByHireDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where hireDate is not null
+        defaultEmployeeShouldBeFound("hireDate.specified=true");
+
+        // Get all the employeeList where hireDate is null
+        defaultEmployeeShouldNotBeFound("hireDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary equals to DEFAULT_SALARY
+        defaultEmployeeShouldBeFound("salary.equals=" + DEFAULT_SALARY);
+
+        // Get all the employeeList where salary equals to UPDATED_SALARY
+        defaultEmployeeShouldNotBeFound("salary.equals=" + UPDATED_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary in DEFAULT_SALARY or UPDATED_SALARY
+        defaultEmployeeShouldBeFound("salary.in=" + DEFAULT_SALARY + "," + UPDATED_SALARY);
+
+        // Get all the employeeList where salary equals to UPDATED_SALARY
+        defaultEmployeeShouldNotBeFound("salary.in=" + UPDATED_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary is not null
+        defaultEmployeeShouldBeFound("salary.specified=true");
+
+        // Get all the employeeList where salary is null
+        defaultEmployeeShouldNotBeFound("salary.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary is greater than or equal to DEFAULT_SALARY
+        defaultEmployeeShouldBeFound("salary.greaterThanOrEqual=" + DEFAULT_SALARY);
+
+        // Get all the employeeList where salary is greater than or equal to UPDATED_SALARY
+        defaultEmployeeShouldNotBeFound("salary.greaterThanOrEqual=" + UPDATED_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary is less than or equal to DEFAULT_SALARY
+        defaultEmployeeShouldBeFound("salary.lessThanOrEqual=" + DEFAULT_SALARY);
+
+        // Get all the employeeList where salary is less than or equal to SMALLER_SALARY
+        defaultEmployeeShouldNotBeFound("salary.lessThanOrEqual=" + SMALLER_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsLessThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary is less than DEFAULT_SALARY
+        defaultEmployeeShouldNotBeFound("salary.lessThan=" + DEFAULT_SALARY);
+
+        // Get all the employeeList where salary is less than UPDATED_SALARY
+        defaultEmployeeShouldBeFound("salary.lessThan=" + UPDATED_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesBySalaryIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where salary is greater than DEFAULT_SALARY
+        defaultEmployeeShouldNotBeFound("salary.greaterThan=" + DEFAULT_SALARY);
+
+        // Get all the employeeList where salary is greater than SMALLER_SALARY
+        defaultEmployeeShouldBeFound("salary.greaterThan=" + SMALLER_SALARY);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct equals to DEFAULT_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.equals=" + DEFAULT_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct equals to UPDATED_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.equals=" + UPDATED_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct in DEFAULT_COMMISSION_PCT or UPDATED_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.in=" + DEFAULT_COMMISSION_PCT + "," + UPDATED_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct equals to UPDATED_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.in=" + UPDATED_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct is not null
+        defaultEmployeeShouldBeFound("commissionPct.specified=true");
+
+        // Get all the employeeList where commissionPct is null
+        defaultEmployeeShouldNotBeFound("commissionPct.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct is greater than or equal to DEFAULT_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.greaterThanOrEqual=" + DEFAULT_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct is greater than or equal to UPDATED_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.greaterThanOrEqual=" + UPDATED_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct is less than or equal to DEFAULT_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.lessThanOrEqual=" + DEFAULT_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct is less than or equal to SMALLER_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.lessThanOrEqual=" + SMALLER_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsLessThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct is less than DEFAULT_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.lessThan=" + DEFAULT_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct is less than UPDATED_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.lessThan=" + UPDATED_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByCommissionPctIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where commissionPct is greater than DEFAULT_COMMISSION_PCT
+        defaultEmployeeShouldNotBeFound("commissionPct.greaterThan=" + DEFAULT_COMMISSION_PCT);
+
+        // Get all the employeeList where commissionPct is greater than SMALLER_COMMISSION_PCT
+        defaultEmployeeShouldBeFound("commissionPct.greaterThan=" + SMALLER_COMMISSION_PCT);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable equals to DEFAULT_ENABLE
+        defaultEmployeeShouldBeFound("enable.equals=" + DEFAULT_ENABLE);
+
+        // Get all the employeeList where enable equals to UPDATED_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.equals=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable in DEFAULT_ENABLE or UPDATED_ENABLE
+        defaultEmployeeShouldBeFound("enable.in=" + DEFAULT_ENABLE + "," + UPDATED_ENABLE);
+
+        // Get all the employeeList where enable equals to UPDATED_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.in=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable is not null
+        defaultEmployeeShouldBeFound("enable.specified=true");
+
+        // Get all the employeeList where enable is null
+        defaultEmployeeShouldNotBeFound("enable.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable is greater than or equal to DEFAULT_ENABLE
+        defaultEmployeeShouldBeFound("enable.greaterThanOrEqual=" + DEFAULT_ENABLE);
+
+        // Get all the employeeList where enable is greater than or equal to UPDATED_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.greaterThanOrEqual=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable is less than or equal to DEFAULT_ENABLE
+        defaultEmployeeShouldBeFound("enable.lessThanOrEqual=" + DEFAULT_ENABLE);
+
+        // Get all the employeeList where enable is less than or equal to SMALLER_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.lessThanOrEqual=" + SMALLER_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsLessThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable is less than DEFAULT_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.lessThan=" + DEFAULT_ENABLE);
+
+        // Get all the employeeList where enable is less than UPDATED_ENABLE
+        defaultEmployeeShouldBeFound("enable.lessThan=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByEnableIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        employeeRepository.saveAndFlush(employee);
+
+        // Get all the employeeList where enable is greater than DEFAULT_ENABLE
+        defaultEmployeeShouldNotBeFound("enable.greaterThan=" + DEFAULT_ENABLE);
+
+        // Get all the employeeList where enable is greater than SMALLER_ENABLE
+        defaultEmployeeShouldBeFound("enable.greaterThan=" + SMALLER_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeesByTaskIsEqualToSomething() throws Exception {
+        Task task;
+        if (TestUtil.findAll(em, Task.class).isEmpty()) {
+            employeeRepository.saveAndFlush(employee);
+            task = TaskResourceIT.createEntity(em);
+        } else {
+            task = TestUtil.findAll(em, Task.class).get(0);
+        }
+        em.persist(task);
+        em.flush();
+        employee.addTask(task);
+        employeeRepository.saveAndFlush(employee);
+        Long taskId = task.getId();
+
+        // Get all the employeeList where task equals to taskId
+        defaultEmployeeShouldBeFound("taskId.equals=" + taskId);
+
+        // Get all the employeeList where task equals to (taskId + 1)
+        defaultEmployeeShouldNotBeFound("taskId.equals=" + (taskId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultEmployeeShouldBeFound(String filter) throws Exception {
+        restEmployeeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(employee.getId().intValue())))
+            .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
+            .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
+            .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)))
+            .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
+            .andExpect(jsonPath("$.[*].hireDate").value(hasItem(DEFAULT_HIRE_DATE.toString())))
+            .andExpect(jsonPath("$.[*].salary").value(hasItem(DEFAULT_SALARY.intValue())))
+            .andExpect(jsonPath("$.[*].commissionPct").value(hasItem(DEFAULT_COMMISSION_PCT.intValue())))
+            .andExpect(jsonPath("$.[*].enable").value(hasItem(DEFAULT_ENABLE)));
+
+        // Check, that the count call also returns 1
+        restEmployeeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultEmployeeShouldNotBeFound(String filter) throws Exception {
+        restEmployeeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restEmployeeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

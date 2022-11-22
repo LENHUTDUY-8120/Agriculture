@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.EmployeeRepository;
+import com.lnduy.agriculture.service.EmployeeQueryService;
 import com.lnduy.agriculture.service.EmployeeService;
+import com.lnduy.agriculture.service.criteria.EmployeeCriteria;
 import com.lnduy.agriculture.service.dto.EmployeeDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,16 @@ public class EmployeeResource {
 
     private final EmployeeRepository employeeRepository;
 
-    public EmployeeResource(EmployeeService employeeService, EmployeeRepository employeeRepository) {
+    private final EmployeeQueryService employeeQueryService;
+
+    public EmployeeResource(
+        EmployeeService employeeService,
+        EmployeeRepository employeeRepository,
+        EmployeeQueryService employeeQueryService
+    ) {
         this.employeeService = employeeService;
         this.employeeRepository = employeeRepository;
+        this.employeeQueryService = employeeQueryService;
     }
 
     /**
@@ -140,14 +148,30 @@ public class EmployeeResource {
      * {@code GET  /employees} : get all the employees.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of employees in body.
      */
     @GetMapping("/employees")
-    public ResponseEntity<List<EmployeeDTO>> getAllEmployees(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Employees");
-        Page<EmployeeDTO> page = employeeService.findAll(pageable);
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployees(
+        EmployeeCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Employees by criteria: {}", criteria);
+        Page<EmployeeDTO> page = employeeQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /employees/count} : count all the employees.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/employees/count")
+    public ResponseEntity<Long> countEmployees(EmployeeCriteria criteria) {
+        log.debug("REST request to count Employees by criteria: {}", criteria);
+        return ResponseEntity.ok().body(employeeQueryService.countByCriteria(criteria));
     }
 
     /**

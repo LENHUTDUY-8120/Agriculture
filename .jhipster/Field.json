@@ -39,7 +39,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Field",
   "pagination": "no",
   "readOnly": false,

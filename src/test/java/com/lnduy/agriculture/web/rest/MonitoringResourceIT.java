@@ -7,8 +7,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.lnduy.agriculture.IntegrationTest;
+import com.lnduy.agriculture.domain.Device;
+import com.lnduy.agriculture.domain.Field;
 import com.lnduy.agriculture.domain.Monitoring;
 import com.lnduy.agriculture.repository.MonitoringRepository;
+import com.lnduy.agriculture.service.criteria.MonitoringCriteria;
 import com.lnduy.agriculture.service.dto.MonitoringDTO;
 import com.lnduy.agriculture.service.mapper.MonitoringMapper;
 import java.time.Instant;
@@ -41,6 +44,7 @@ class MonitoringResourceIT {
 
     private static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final ZonedDateTime SMALLER_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
     private static final String ENTITY_API_URL = "/api/monitorings";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -156,6 +160,265 @@ class MonitoringResourceIT {
             .andExpect(jsonPath("$.id").value(monitoring.getId().intValue()))
             .andExpect(jsonPath("$.dataJson").value(DEFAULT_DATA_JSON))
             .andExpect(jsonPath("$.createdAt").value(sameInstant(DEFAULT_CREATED_AT)));
+    }
+
+    @Test
+    @Transactional
+    void getMonitoringsByIdFiltering() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        Long id = monitoring.getId();
+
+        defaultMonitoringShouldBeFound("id.equals=" + id);
+        defaultMonitoringShouldNotBeFound("id.notEquals=" + id);
+
+        defaultMonitoringShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultMonitoringShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultMonitoringShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultMonitoringShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDataJsonIsEqualToSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where dataJson equals to DEFAULT_DATA_JSON
+        defaultMonitoringShouldBeFound("dataJson.equals=" + DEFAULT_DATA_JSON);
+
+        // Get all the monitoringList where dataJson equals to UPDATED_DATA_JSON
+        defaultMonitoringShouldNotBeFound("dataJson.equals=" + UPDATED_DATA_JSON);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDataJsonIsInShouldWork() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where dataJson in DEFAULT_DATA_JSON or UPDATED_DATA_JSON
+        defaultMonitoringShouldBeFound("dataJson.in=" + DEFAULT_DATA_JSON + "," + UPDATED_DATA_JSON);
+
+        // Get all the monitoringList where dataJson equals to UPDATED_DATA_JSON
+        defaultMonitoringShouldNotBeFound("dataJson.in=" + UPDATED_DATA_JSON);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDataJsonIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where dataJson is not null
+        defaultMonitoringShouldBeFound("dataJson.specified=true");
+
+        // Get all the monitoringList where dataJson is null
+        defaultMonitoringShouldNotBeFound("dataJson.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDataJsonContainsSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where dataJson contains DEFAULT_DATA_JSON
+        defaultMonitoringShouldBeFound("dataJson.contains=" + DEFAULT_DATA_JSON);
+
+        // Get all the monitoringList where dataJson contains UPDATED_DATA_JSON
+        defaultMonitoringShouldNotBeFound("dataJson.contains=" + UPDATED_DATA_JSON);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDataJsonNotContainsSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where dataJson does not contain DEFAULT_DATA_JSON
+        defaultMonitoringShouldNotBeFound("dataJson.doesNotContain=" + DEFAULT_DATA_JSON);
+
+        // Get all the monitoringList where dataJson does not contain UPDATED_DATA_JSON
+        defaultMonitoringShouldBeFound("dataJson.doesNotContain=" + UPDATED_DATA_JSON);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt equals to DEFAULT_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.equals=" + DEFAULT_CREATED_AT);
+
+        // Get all the monitoringList where createdAt equals to UPDATED_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.equals=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt in DEFAULT_CREATED_AT or UPDATED_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT);
+
+        // Get all the monitoringList where createdAt equals to UPDATED_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.in=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt is not null
+        defaultMonitoringShouldBeFound("createdAt.specified=true");
+
+        // Get all the monitoringList where createdAt is null
+        defaultMonitoringShouldNotBeFound("createdAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt is greater than or equal to DEFAULT_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.greaterThanOrEqual=" + DEFAULT_CREATED_AT);
+
+        // Get all the monitoringList where createdAt is greater than or equal to UPDATED_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.greaterThanOrEqual=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt is less than or equal to DEFAULT_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.lessThanOrEqual=" + DEFAULT_CREATED_AT);
+
+        // Get all the monitoringList where createdAt is less than or equal to SMALLER_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.lessThanOrEqual=" + SMALLER_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt is less than DEFAULT_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.lessThan=" + DEFAULT_CREATED_AT);
+
+        // Get all the monitoringList where createdAt is less than UPDATED_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.lessThan=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByCreatedAtIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        monitoringRepository.saveAndFlush(monitoring);
+
+        // Get all the monitoringList where createdAt is greater than DEFAULT_CREATED_AT
+        defaultMonitoringShouldNotBeFound("createdAt.greaterThan=" + DEFAULT_CREATED_AT);
+
+        // Get all the monitoringList where createdAt is greater than SMALLER_CREATED_AT
+        defaultMonitoringShouldBeFound("createdAt.greaterThan=" + SMALLER_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByFieldIsEqualToSomething() throws Exception {
+        Field field;
+        if (TestUtil.findAll(em, Field.class).isEmpty()) {
+            monitoringRepository.saveAndFlush(monitoring);
+            field = FieldResourceIT.createEntity(em);
+        } else {
+            field = TestUtil.findAll(em, Field.class).get(0);
+        }
+        em.persist(field);
+        em.flush();
+        monitoring.setField(field);
+        monitoringRepository.saveAndFlush(monitoring);
+        Long fieldId = field.getId();
+
+        // Get all the monitoringList where field equals to fieldId
+        defaultMonitoringShouldBeFound("fieldId.equals=" + fieldId);
+
+        // Get all the monitoringList where field equals to (fieldId + 1)
+        defaultMonitoringShouldNotBeFound("fieldId.equals=" + (fieldId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllMonitoringsByDeviceIsEqualToSomething() throws Exception {
+        Device device;
+        if (TestUtil.findAll(em, Device.class).isEmpty()) {
+            monitoringRepository.saveAndFlush(monitoring);
+            device = DeviceResourceIT.createEntity(em);
+        } else {
+            device = TestUtil.findAll(em, Device.class).get(0);
+        }
+        em.persist(device);
+        em.flush();
+        monitoring.setDevice(device);
+        monitoringRepository.saveAndFlush(monitoring);
+        Long deviceId = device.getId();
+
+        // Get all the monitoringList where device equals to deviceId
+        defaultMonitoringShouldBeFound("deviceId.equals=" + deviceId);
+
+        // Get all the monitoringList where device equals to (deviceId + 1)
+        defaultMonitoringShouldNotBeFound("deviceId.equals=" + (deviceId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultMonitoringShouldBeFound(String filter) throws Exception {
+        restMonitoringMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(monitoring.getId().intValue())))
+            .andExpect(jsonPath("$.[*].dataJson").value(hasItem(DEFAULT_DATA_JSON)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))));
+
+        // Check, that the count call also returns 1
+        restMonitoringMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultMonitoringShouldNotBeFound(String filter) throws Exception {
+        restMonitoringMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restMonitoringMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

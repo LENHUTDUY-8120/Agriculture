@@ -31,11 +31,17 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Fertilizers",
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [
+    {
+      "otherEntityName": "warehouse",
+      "otherEntityRelationshipName": "fertilizers",
+      "relationshipName": "warehouse",
+      "relationshipType": "many-to-one"
+    },
     {
       "otherEntityName": "task",
       "otherEntityRelationshipName": "fertilizers",

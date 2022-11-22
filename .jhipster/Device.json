@@ -31,7 +31,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Device",
   "pagination": "no",
   "readOnly": false,

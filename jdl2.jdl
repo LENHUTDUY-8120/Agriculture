@@ -1,0 +1,168 @@
+entity Field {
+	code String,
+	name String,
+    geoJson String,
+    area Double,
+    descriptions String,
+    enable Integer,
+    latitude Double,
+    longitude Double,
+}
+
+entity Monitoring {
+	dataJson String,
+	createdAt ZonedDateTime,
+}
+
+entity Season {
+ 	crops String,
+    totalCost Double,
+    cropYields Double,
+    enable Integer,
+    unit String,
+    done Integer,
+    startAt ZonedDateTime,
+    endAt ZonedDateTime,
+}
+
+entity SoilType {
+	name String,
+    descriptions String,
+}
+
+entity Warehouse {
+	name String,
+    area Double,
+    description String,
+    latitude Double,
+    longitude Double,
+    enable Integer,
+}
+
+entity Crops {
+	name String,
+    volume Float,
+    unit String,
+    description String,
+    enable Integer,
+}
+
+entity Fertilizers {
+	name String,
+    description String,
+    type String,
+    volume Float,
+    unit String,
+    enable Integer,
+}
+
+entity ProtectionProduct {
+	name String,
+    description String,
+    type String,
+    volume Float,
+    unit String,
+    enable Integer,
+}
+
+entity Supplies {
+	name String,
+    property String,
+    type String,
+    enable Integer,
+}
+
+entity Device {
+	name String,
+    code String,
+    ip String,
+    property String,
+    type String,
+    enable Integer,
+}
+
+entity DeviceCategory {
+	name String,
+    description String,
+}
+
+entity Event {
+	startDate ZonedDateTime,
+    endDate ZonedDateTime,
+    title String,
+    descriptions String,
+    content String,
+    startAt ZonedDateTime,
+    endAt ZonedDateTime,
+}
+
+entity EventCategory {
+	name String,
+}
+
+/**
+ * Task entity.
+ * @author The JHipster team.
+ */
+entity Task {
+	title String,
+	description String,
+    enable Integer,
+    startDate ZonedDateTime,
+    endDate ZonedDateTime
+}
+
+entity Employee {
+	firstName String,
+	lastName String,
+	email String,
+	phoneNumber String,
+	hireDate Instant,
+	salary Long,
+	commissionPct Long,
+    enable Integer,
+}
+
+entity Transaction {
+	total BigDecimal,
+  	price BigDecimal,
+    type String,
+    descriptions String,
+    createdAt ZonedDateTime,
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Field to Season{field}
+    Field to Device{field}
+    Season to Transaction{season}
+    Warehouse to Supplies{warehouse}
+    Warehouse to ProtectionProduct{warehouse}
+    Warehouse to Fertilizers{warehouse}
+}
+
+relationship ManyToOne {
+	Season{crop} to Crops
+	Field{soil} to SoilType
+    Device{category} to DeviceCategory
+    Event{category} to EventCategory
+    Task{season} to Season
+    Monitoring{field} to Field
+    Monitoring{device} to Device
+}
+
+relationship ManyToMany {
+	Task{employee} to Employee{task}
+    Task{supplies} to Supplies{task}
+    Task{protectionproduct} to ProtectionProduct{task}
+    Task{fertilizers} to Fertilizers{task}
+}
+
+// Set pagination options
+paginate Crops, Fertilizers, ProtectionProduct, Supplies, Employee, Season, Transaction, Task, Event with pagination
+
+//Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all
+service all with serviceImpl

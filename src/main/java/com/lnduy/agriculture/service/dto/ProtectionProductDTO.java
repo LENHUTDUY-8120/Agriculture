@@ -23,6 +23,8 @@ public class ProtectionProductDTO implements Serializable {
 
     private Integer enable;
 
+    private WarehouseDTO warehouse;
+
     public Long getId() {
         return id;
     }
@@ -79,6 +81,14 @@ public class ProtectionProductDTO implements Serializable {
         this.enable = enable;
     }
 
+    public WarehouseDTO getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(WarehouseDTO warehouse) {
+        this.warehouse = warehouse;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -111,6 +121,7 @@ public class ProtectionProductDTO implements Serializable {
             ", volume=" + getVolume() +
             ", unit='" + getUnit() + "'" +
             ", enable=" + getEnable() +
+            ", warehouse=" + getWarehouse() +
             "}";
     }
 }

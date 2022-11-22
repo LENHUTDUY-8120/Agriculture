@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.lnduy.agriculture.IntegrationTest;
 import com.lnduy.agriculture.domain.SoilType;
 import com.lnduy.agriculture.repository.SoilTypeRepository;
+import com.lnduy.agriculture.service.criteria.SoilTypeCriteria;
 import com.lnduy.agriculture.service.dto.SoilTypeDTO;
 import com.lnduy.agriculture.service.mapper.SoilTypeMapper;
 import java.util.List;
@@ -151,6 +152,193 @@ class SoilTypeResourceIT {
             .andExpect(jsonPath("$.id").value(soilType.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.descriptions").value(DEFAULT_DESCRIPTIONS));
+    }
+
+    @Test
+    @Transactional
+    void getSoilTypesByIdFiltering() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        Long id = soilType.getId();
+
+        defaultSoilTypeShouldBeFound("id.equals=" + id);
+        defaultSoilTypeShouldNotBeFound("id.notEquals=" + id);
+
+        defaultSoilTypeShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultSoilTypeShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultSoilTypeShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultSoilTypeShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where name equals to DEFAULT_NAME
+        defaultSoilTypeShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the soilTypeList where name equals to UPDATED_NAME
+        defaultSoilTypeShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultSoilTypeShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the soilTypeList where name equals to UPDATED_NAME
+        defaultSoilTypeShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where name is not null
+        defaultSoilTypeShouldBeFound("name.specified=true");
+
+        // Get all the soilTypeList where name is null
+        defaultSoilTypeShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByNameContainsSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where name contains DEFAULT_NAME
+        defaultSoilTypeShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the soilTypeList where name contains UPDATED_NAME
+        defaultSoilTypeShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where name does not contain DEFAULT_NAME
+        defaultSoilTypeShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the soilTypeList where name does not contain UPDATED_NAME
+        defaultSoilTypeShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByDescriptionsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where descriptions equals to DEFAULT_DESCRIPTIONS
+        defaultSoilTypeShouldBeFound("descriptions.equals=" + DEFAULT_DESCRIPTIONS);
+
+        // Get all the soilTypeList where descriptions equals to UPDATED_DESCRIPTIONS
+        defaultSoilTypeShouldNotBeFound("descriptions.equals=" + UPDATED_DESCRIPTIONS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByDescriptionsIsInShouldWork() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where descriptions in DEFAULT_DESCRIPTIONS or UPDATED_DESCRIPTIONS
+        defaultSoilTypeShouldBeFound("descriptions.in=" + DEFAULT_DESCRIPTIONS + "," + UPDATED_DESCRIPTIONS);
+
+        // Get all the soilTypeList where descriptions equals to UPDATED_DESCRIPTIONS
+        defaultSoilTypeShouldNotBeFound("descriptions.in=" + UPDATED_DESCRIPTIONS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByDescriptionsIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where descriptions is not null
+        defaultSoilTypeShouldBeFound("descriptions.specified=true");
+
+        // Get all the soilTypeList where descriptions is null
+        defaultSoilTypeShouldNotBeFound("descriptions.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByDescriptionsContainsSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where descriptions contains DEFAULT_DESCRIPTIONS
+        defaultSoilTypeShouldBeFound("descriptions.contains=" + DEFAULT_DESCRIPTIONS);
+
+        // Get all the soilTypeList where descriptions contains UPDATED_DESCRIPTIONS
+        defaultSoilTypeShouldNotBeFound("descriptions.contains=" + UPDATED_DESCRIPTIONS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSoilTypesByDescriptionsNotContainsSomething() throws Exception {
+        // Initialize the database
+        soilTypeRepository.saveAndFlush(soilType);
+
+        // Get all the soilTypeList where descriptions does not contain DEFAULT_DESCRIPTIONS
+        defaultSoilTypeShouldNotBeFound("descriptions.doesNotContain=" + DEFAULT_DESCRIPTIONS);
+
+        // Get all the soilTypeList where descriptions does not contain UPDATED_DESCRIPTIONS
+        defaultSoilTypeShouldBeFound("descriptions.doesNotContain=" + UPDATED_DESCRIPTIONS);
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultSoilTypeShouldBeFound(String filter) throws Exception {
+        restSoilTypeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(soilType.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].descriptions").value(hasItem(DEFAULT_DESCRIPTIONS)));
+
+        // Check, that the count call also returns 1
+        restSoilTypeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultSoilTypeShouldNotBeFound(String filter) throws Exception {
+        restSoilTypeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restSoilTypeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

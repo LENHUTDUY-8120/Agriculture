@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SeasonRepository extends JpaRepository<Season, Long> {}
+public interface SeasonRepository extends JpaRepository<Season, Long>, JpaSpecificationExecutor<Season> {}

@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.DeviceCategoryRepository;
+import com.lnduy.agriculture.service.DeviceCategoryQueryService;
 import com.lnduy.agriculture.service.DeviceCategoryService;
+import com.lnduy.agriculture.service.criteria.DeviceCategoryCriteria;
 import com.lnduy.agriculture.service.dto.DeviceCategoryDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,16 @@ public class DeviceCategoryResource {
 
     private final DeviceCategoryRepository deviceCategoryRepository;
 
-    public DeviceCategoryResource(DeviceCategoryService deviceCategoryService, DeviceCategoryRepository deviceCategoryRepository) {
+    private final DeviceCategoryQueryService deviceCategoryQueryService;
+
+    public DeviceCategoryResource(
+        DeviceCategoryService deviceCategoryService,
+        DeviceCategoryRepository deviceCategoryRepository,
+        DeviceCategoryQueryService deviceCategoryQueryService
+    ) {
         this.deviceCategoryService = deviceCategoryService;
         this.deviceCategoryRepository = deviceCategoryRepository;
+        this.deviceCategoryQueryService = deviceCategoryQueryService;
     }
 
     /**
@@ -134,12 +143,26 @@ public class DeviceCategoryResource {
     /**
      * {@code GET  /device-categories} : get all the deviceCategories.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of deviceCategories in body.
      */
     @GetMapping("/device-categories")
-    public List<DeviceCategoryDTO> getAllDeviceCategories() {
-        log.debug("REST request to get all DeviceCategories");
-        return deviceCategoryService.findAll();
+    public ResponseEntity<List<DeviceCategoryDTO>> getAllDeviceCategories(DeviceCategoryCriteria criteria) {
+        log.debug("REST request to get DeviceCategories by criteria: {}", criteria);
+        List<DeviceCategoryDTO> entityList = deviceCategoryQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /device-categories/count} : count all the deviceCategories.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/device-categories/count")
+    public ResponseEntity<Long> countDeviceCategories(DeviceCategoryCriteria criteria) {
+        log.debug("REST request to count DeviceCategories by criteria: {}", criteria);
+        return ResponseEntity.ok().body(deviceCategoryQueryService.countByCriteria(criteria));
     }
 
     /**

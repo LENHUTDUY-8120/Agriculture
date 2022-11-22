@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {}
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity Crops.
+    -->
+    <changeSet id="20221118233608-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="warehouse_id"
+                                 baseTableName="crops"
+                                 constraintName="fk_crops__warehouse_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="warehouse"/>
+    </changeSet>
+</databaseChangeLog>

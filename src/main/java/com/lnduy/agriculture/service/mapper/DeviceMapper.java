@@ -18,12 +18,12 @@ public interface DeviceMapper extends EntityMapper<DeviceDTO, Device> {
     DeviceDTO toDto(Device s);
 
     @Named("deviceCategoryId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     DeviceCategoryDTO toDtoDeviceCategoryId(DeviceCategory deviceCategory);
 
     @Named("fieldId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     FieldDTO toDtoFieldId(Field field);
 }

@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.MonitoringRepository;
+import com.lnduy.agriculture.service.MonitoringQueryService;
 import com.lnduy.agriculture.service.MonitoringService;
+import com.lnduy.agriculture.service.criteria.MonitoringCriteria;
 import com.lnduy.agriculture.service.dto.MonitoringDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,16 @@ public class MonitoringResource {
 
     private final MonitoringRepository monitoringRepository;
 
-    public MonitoringResource(MonitoringService monitoringService, MonitoringRepository monitoringRepository) {
+    private final MonitoringQueryService monitoringQueryService;
+
+    public MonitoringResource(
+        MonitoringService monitoringService,
+        MonitoringRepository monitoringRepository,
+        MonitoringQueryService monitoringQueryService
+    ) {
         this.monitoringService = monitoringService;
         this.monitoringRepository = monitoringRepository;
+        this.monitoringQueryService = monitoringQueryService;
     }
 
     /**
@@ -133,12 +142,26 @@ public class MonitoringResource {
     /**
      * {@code GET  /monitorings} : get all the monitorings.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of monitorings in body.
      */
     @GetMapping("/monitorings")
-    public List<MonitoringDTO> getAllMonitorings() {
-        log.debug("REST request to get all Monitorings");
-        return monitoringService.findAll();
+    public ResponseEntity<List<MonitoringDTO>> getAllMonitorings(MonitoringCriteria criteria) {
+        log.debug("REST request to get Monitorings by criteria: {}", criteria);
+        List<MonitoringDTO> entityList = monitoringQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /monitorings/count} : count all the monitorings.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/monitorings/count")
+    public ResponseEntity<Long> countMonitorings(MonitoringCriteria criteria) {
+        log.debug("REST request to count Monitorings by criteria: {}", criteria);
+        return ResponseEntity.ok().body(monitoringQueryService.countByCriteria(criteria));
     }
 
     /**

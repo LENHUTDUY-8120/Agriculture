@@ -18,6 +18,8 @@ public class SeasonDTO implements Serializable {
 
     private Double cropYields;
 
+    private Integer enable;
+
     private String unit;
 
     private Integer done;
@@ -60,6 +62,14 @@ public class SeasonDTO implements Serializable {
 
     public void setCropYields(Double cropYields) {
         this.cropYields = cropYields;
+    }
+
+    public Integer getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
     }
 
     public String getUnit() {
@@ -139,6 +149,7 @@ public class SeasonDTO implements Serializable {
             ", crops='" + getCrops() + "'" +
             ", totalCost=" + getTotalCost() +
             ", cropYields=" + getCropYields() +
+            ", enable=" + getEnable() +
             ", unit='" + getUnit() + "'" +
             ", done=" + getDone() +
             ", startAt='" + getStartAt() + "'" +

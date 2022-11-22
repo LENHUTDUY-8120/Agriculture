@@ -35,12 +35,12 @@ public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     Task toEntity(TaskDTO taskDTO);
 
     @Named("seasonId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     SeasonDTO toDtoSeasonId(Season season);
 
     @Named("employeeId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     EmployeeDTO toDtoEmployeeId(Employee employee);
 
@@ -50,7 +50,7 @@ public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     }
 
     @Named("suppliesId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     SuppliesDTO toDtoSuppliesId(Supplies supplies);
 
@@ -60,7 +60,7 @@ public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     }
 
     @Named("protectionProductId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     ProtectionProductDTO toDtoProtectionProductId(ProtectionProduct protectionProduct);
 
@@ -70,7 +70,7 @@ public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     }
 
     @Named("fertilizersId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     FertilizersDTO toDtoFertilizersId(Fertilizers fertilizers);
 

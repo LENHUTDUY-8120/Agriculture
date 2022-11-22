@@ -32,6 +32,9 @@ public class Season implements Serializable {
     @Column(name = "crop_yields")
     private Double cropYields;
 
+    @Column(name = "enable")
+    private Integer enable;
+
     @Column(name = "unit")
     private String unit;
 
@@ -49,6 +52,7 @@ public class Season implements Serializable {
     private Set<Transaction> transactions = new HashSet<>();
 
     @ManyToOne
+    @JsonIgnoreProperties(value = { "warehouse" }, allowSetters = true)
     private Crops crop;
 
     @ManyToOne
@@ -107,6 +111,19 @@ public class Season implements Serializable {
 
     public void setCropYields(Double cropYields) {
         this.cropYields = cropYields;
+    }
+
+    public Integer getEnable() {
+        return this.enable;
+    }
+
+    public Season enable(Integer enable) {
+        this.setEnable(enable);
+        return this;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
     }
 
     public String getUnit() {
@@ -245,6 +262,7 @@ public class Season implements Serializable {
             ", crops='" + getCrops() + "'" +
             ", totalCost=" + getTotalCost() +
             ", cropYields=" + getCropYields() +
+            ", enable=" + getEnable() +
             ", unit='" + getUnit() + "'" +
             ", done=" + getDone() +
             ", startAt='" + getStartAt() + "'" +

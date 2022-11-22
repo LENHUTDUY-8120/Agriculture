@@ -15,7 +15,7 @@ public interface TransactionMapper extends EntityMapper<TransactionDTO, Transact
     TransactionDTO toDto(Transaction s);
 
     @Named("seasonId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     SeasonDTO toDtoSeasonId(Season season);
 }

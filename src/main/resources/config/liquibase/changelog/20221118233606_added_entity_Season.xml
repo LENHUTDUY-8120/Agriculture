@@ -23,6 +23,9 @@
             <column name="crop_yields" type="double">
                 <constraints nullable="true" />
             </column>
+            <column name="enable" type="integer">
+                <constraints nullable="true" />
+            </column>
             <column name="unit" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -67,6 +70,7 @@
             <column name="crops" type="string"/>
             <column name="total_cost" type="numeric"/>
             <column name="crop_yields" type="numeric"/>
+            <column name="enable" type="numeric"/>
             <column name="unit" type="string"/>
             <column name="done" type="numeric"/>
             <column name="start_at" type="date"/>

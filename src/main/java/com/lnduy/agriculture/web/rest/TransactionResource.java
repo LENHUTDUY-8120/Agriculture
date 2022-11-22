@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.TransactionRepository;
+import com.lnduy.agriculture.service.TransactionQueryService;
 import com.lnduy.agriculture.service.TransactionService;
+import com.lnduy.agriculture.service.criteria.TransactionCriteria;
 import com.lnduy.agriculture.service.dto.TransactionDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,16 @@ public class TransactionResource {
 
     private final TransactionRepository transactionRepository;
 
-    public TransactionResource(TransactionService transactionService, TransactionRepository transactionRepository) {
+    private final TransactionQueryService transactionQueryService;
+
+    public TransactionResource(
+        TransactionService transactionService,
+        TransactionRepository transactionRepository,
+        TransactionQueryService transactionQueryService
+    ) {
         this.transactionService = transactionService;
         this.transactionRepository = transactionRepository;
+        this.transactionQueryService = transactionQueryService;
     }
 
     /**
@@ -140,14 +148,30 @@ public class TransactionResource {
      * {@code GET  /transactions} : get all the transactions.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of transactions in body.
      */
     @GetMapping("/transactions")
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Transactions");
-        Page<TransactionDTO> page = transactionService.findAll(pageable);
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(
+        TransactionCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Transactions by criteria: {}", criteria);
+        Page<TransactionDTO> page = transactionQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /transactions/count} : count all the transactions.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/transactions/count")
+    public ResponseEntity<Long> countTransactions(TransactionCriteria criteria) {
+        log.debug("REST request to count Transactions by criteria: {}", criteria);
+        return ResponseEntity.ok().body(transactionQueryService.countByCriteria(criteria));
     }
 
     /**

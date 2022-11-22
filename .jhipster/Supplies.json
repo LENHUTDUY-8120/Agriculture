@@ -18,16 +18,30 @@
       "fieldType": "String"
     },
     {
+      "fieldName": "volume",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "unit",
+      "fieldType": "String"
+    },
+    {
       "fieldName": "enable",
       "fieldType": "Integer"
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Supplies",
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [
+    {
+      "otherEntityName": "warehouse",
+      "otherEntityRelationshipName": "supplies",
+      "relationshipName": "warehouse",
+      "relationshipType": "many-to-one"
+    },
     {
       "otherEntityName": "task",
       "otherEntityRelationshipName": "supplies",

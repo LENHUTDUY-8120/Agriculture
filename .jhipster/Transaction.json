@@ -27,7 +27,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Transaction",
   "pagination": "pagination",
   "readOnly": false,

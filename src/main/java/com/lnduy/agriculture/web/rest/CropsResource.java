@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.CropsRepository;
+import com.lnduy.agriculture.service.CropsQueryService;
 import com.lnduy.agriculture.service.CropsService;
+import com.lnduy.agriculture.service.criteria.CropsCriteria;
 import com.lnduy.agriculture.service.dto.CropsDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,12 @@ public class CropsResource {
 
     private final CropsRepository cropsRepository;
 
-    public CropsResource(CropsService cropsService, CropsRepository cropsRepository) {
+    private final CropsQueryService cropsQueryService;
+
+    public CropsResource(CropsService cropsService, CropsRepository cropsRepository, CropsQueryService cropsQueryService) {
         this.cropsService = cropsService;
         this.cropsRepository = cropsRepository;
+        this.cropsQueryService = cropsQueryService;
     }
 
     /**
@@ -140,14 +144,30 @@ public class CropsResource {
      * {@code GET  /crops} : get all the crops.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of crops in body.
      */
     @GetMapping("/crops")
-    public ResponseEntity<List<CropsDTO>> getAllCrops(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Crops");
-        Page<CropsDTO> page = cropsService.findAll(pageable);
+    public ResponseEntity<List<CropsDTO>> getAllCrops(
+        CropsCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Crops by criteria: {}", criteria);
+        Page<CropsDTO> page = cropsQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /crops/count} : count all the crops.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/crops/count")
+    public ResponseEntity<Long> countCrops(CropsCriteria criteria) {
+        log.debug("REST request to count Crops by criteria: {}", criteria);
+        return ResponseEntity.ok().body(cropsQueryService.countByCriteria(criteria));
     }
 
     /**

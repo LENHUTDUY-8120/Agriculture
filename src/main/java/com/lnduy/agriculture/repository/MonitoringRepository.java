@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface MonitoringRepository extends JpaRepository<Monitoring, Long> {}
+public interface MonitoringRepository extends JpaRepository<Monitoring, Long>, JpaSpecificationExecutor<Monitoring> {}

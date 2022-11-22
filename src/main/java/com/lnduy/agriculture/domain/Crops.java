@@ -1,5 +1,6 @@
 package com.lnduy.agriculture.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import javax.persistence.*;
 
@@ -30,6 +31,13 @@ public class Crops implements Serializable {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "enable")
+    private Integer enable;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "supplies", "protectionProducts", "fertilizers", "crops" }, allowSetters = true)
+    private Warehouse warehouse;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -98,6 +106,32 @@ public class Crops implements Serializable {
         this.description = description;
     }
 
+    public Integer getEnable() {
+        return this.enable;
+    }
+
+    public Crops enable(Integer enable) {
+        this.setEnable(enable);
+        return this;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
+    }
+
+    public Warehouse getWarehouse() {
+        return this.warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
+    }
+
+    public Crops warehouse(Warehouse warehouse) {
+        this.setWarehouse(warehouse);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -126,6 +160,7 @@ public class Crops implements Serializable {
             ", volume=" + getVolume() +
             ", unit='" + getUnit() + "'" +
             ", description='" + getDescription() + "'" +
+            ", enable=" + getEnable() +
             "}";
     }
 }

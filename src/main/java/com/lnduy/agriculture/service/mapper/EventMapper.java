@@ -15,7 +15,7 @@ public interface EventMapper extends EntityMapper<EventDTO, Event> {
     EventDTO toDto(Event s);
 
     @Named("eventCategoryId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     EventCategoryDTO toDtoEventCategoryId(EventCategory eventCategory);
 }

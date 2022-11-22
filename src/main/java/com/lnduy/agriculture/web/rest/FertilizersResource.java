@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.FertilizersRepository;
+import com.lnduy.agriculture.service.FertilizersQueryService;
 import com.lnduy.agriculture.service.FertilizersService;
+import com.lnduy.agriculture.service.criteria.FertilizersCriteria;
 import com.lnduy.agriculture.service.dto.FertilizersDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,16 @@ public class FertilizersResource {
 
     private final FertilizersRepository fertilizersRepository;
 
-    public FertilizersResource(FertilizersService fertilizersService, FertilizersRepository fertilizersRepository) {
+    private final FertilizersQueryService fertilizersQueryService;
+
+    public FertilizersResource(
+        FertilizersService fertilizersService,
+        FertilizersRepository fertilizersRepository,
+        FertilizersQueryService fertilizersQueryService
+    ) {
         this.fertilizersService = fertilizersService;
         this.fertilizersRepository = fertilizersRepository;
+        this.fertilizersQueryService = fertilizersQueryService;
     }
 
     /**
@@ -140,14 +148,30 @@ public class FertilizersResource {
      * {@code GET  /fertilizers} : get all the fertilizers.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of fertilizers in body.
      */
     @GetMapping("/fertilizers")
-    public ResponseEntity<List<FertilizersDTO>> getAllFertilizers(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Fertilizers");
-        Page<FertilizersDTO> page = fertilizersService.findAll(pageable);
+    public ResponseEntity<List<FertilizersDTO>> getAllFertilizers(
+        FertilizersCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Fertilizers by criteria: {}", criteria);
+        Page<FertilizersDTO> page = fertilizersQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /fertilizers/count} : count all the fertilizers.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/fertilizers/count")
+    public ResponseEntity<Long> countFertilizers(FertilizersCriteria criteria) {
+        log.debug("REST request to count Fertilizers by criteria: {}", criteria);
+        return ResponseEntity.ok().body(fertilizersQueryService.countByCriteria(criteria));
     }
 
     /**

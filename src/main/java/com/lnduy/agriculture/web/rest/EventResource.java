@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.EventRepository;
+import com.lnduy.agriculture.service.EventQueryService;
 import com.lnduy.agriculture.service.EventService;
+import com.lnduy.agriculture.service.criteria.EventCriteria;
 import com.lnduy.agriculture.service.dto.EventDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,12 @@ public class EventResource {
 
     private final EventRepository eventRepository;
 
-    public EventResource(EventService eventService, EventRepository eventRepository) {
+    private final EventQueryService eventQueryService;
+
+    public EventResource(EventService eventService, EventRepository eventRepository, EventQueryService eventQueryService) {
         this.eventService = eventService;
         this.eventRepository = eventRepository;
+        this.eventQueryService = eventQueryService;
     }
 
     /**
@@ -140,14 +144,30 @@ public class EventResource {
      * {@code GET  /events} : get all the events.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of events in body.
      */
     @GetMapping("/events")
-    public ResponseEntity<List<EventDTO>> getAllEvents(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Events");
-        Page<EventDTO> page = eventService.findAll(pageable);
+    public ResponseEntity<List<EventDTO>> getAllEvents(
+        EventCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Events by criteria: {}", criteria);
+        Page<EventDTO> page = eventQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /events/count} : count all the events.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/events/count")
+    public ResponseEntity<Long> countEvents(EventCriteria criteria) {
+        log.debug("REST request to count Events by criteria: {}", criteria);
+        return ResponseEntity.ok().body(eventQueryService.countByCriteria(criteria));
     }
 
     /**

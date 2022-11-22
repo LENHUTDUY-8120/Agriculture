@@ -19,6 +19,10 @@ public class CropsDTO implements Serializable {
 
     private String description;
 
+    private Integer enable;
+
+    private WarehouseDTO warehouse;
+
     public Long getId() {
         return id;
     }
@@ -59,6 +63,22 @@ public class CropsDTO implements Serializable {
         this.description = description;
     }
 
+    public Integer getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
+    }
+
+    public WarehouseDTO getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(WarehouseDTO warehouse) {
+        this.warehouse = warehouse;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -89,6 +109,8 @@ public class CropsDTO implements Serializable {
             ", volume=" + getVolume() +
             ", unit='" + getUnit() + "'" +
             ", description='" + getDescription() + "'" +
+            ", enable=" + getEnable() +
+            ", warehouse=" + getWarehouse() +
             "}";
     }
 }

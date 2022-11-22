@@ -20,6 +20,8 @@ public class TaskDTO implements Serializable {
 
     private String description;
 
+    private Integer enable;
+
     private ZonedDateTime startDate;
 
     private ZonedDateTime endDate;
@@ -56,6 +58,14 @@ public class TaskDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Integer enable) {
+        this.enable = enable;
     }
 
     public ZonedDateTime getStartDate() {
@@ -142,6 +152,7 @@ public class TaskDTO implements Serializable {
             "id=" + getId() +
             ", title='" + getTitle() + "'" +
             ", description='" + getDescription() + "'" +
+            ", enable=" + getEnable() +
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
             ", season=" + getSeason() +

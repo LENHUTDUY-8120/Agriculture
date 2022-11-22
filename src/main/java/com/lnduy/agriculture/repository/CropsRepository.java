@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CropsRepository extends JpaRepository<Crops, Long> {}
+public interface CropsRepository extends JpaRepository<Crops, Long>, JpaSpecificationExecutor<Crops> {}

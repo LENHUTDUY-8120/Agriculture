@@ -17,7 +17,13 @@ public class SuppliesDTO implements Serializable {
 
     private String type;
 
+    private Float volume;
+
+    private String unit;
+
     private Integer enable;
+
+    private WarehouseDTO warehouse;
 
     public Long getId() {
         return id;
@@ -51,12 +57,36 @@ public class SuppliesDTO implements Serializable {
         this.type = type;
     }
 
+    public Float getVolume() {
+        return volume;
+    }
+
+    public void setVolume(Float volume) {
+        this.volume = volume;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public Integer getEnable() {
         return enable;
     }
 
     public void setEnable(Integer enable) {
         this.enable = enable;
+    }
+
+    public WarehouseDTO getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(WarehouseDTO warehouse) {
+        this.warehouse = warehouse;
     }
 
     @Override
@@ -88,7 +118,10 @@ public class SuppliesDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", property='" + getProperty() + "'" +
             ", type='" + getType() + "'" +
+            ", volume=" + getVolume() +
+            ", unit='" + getUnit() + "'" +
             ", enable=" + getEnable() +
+            ", warehouse=" + getWarehouse() +
             "}";
     }
 }

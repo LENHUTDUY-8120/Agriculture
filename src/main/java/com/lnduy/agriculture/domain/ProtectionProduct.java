@@ -40,6 +40,10 @@ public class ProtectionProduct implements Serializable {
     @Column(name = "enable")
     private Integer enable;
 
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "supplies", "protectionProducts", "fertilizers", "crops" }, allowSetters = true)
+    private Warehouse warehouse;
+
     @ManyToMany(mappedBy = "protectionproducts")
     @JsonIgnoreProperties(value = { "season", "employees", "supplies", "protectionproducts", "fertilizers" }, allowSetters = true)
     private Set<Task> tasks = new HashSet<>();
@@ -135,6 +139,19 @@ public class ProtectionProduct implements Serializable {
 
     public void setEnable(Integer enable) {
         this.enable = enable;
+    }
+
+    public Warehouse getWarehouse() {
+        return this.warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
+    }
+
+    public ProtectionProduct warehouse(Warehouse warehouse) {
+        this.setWarehouse(warehouse);
+        return this;
     }
 
     public Set<Task> getTasks() {

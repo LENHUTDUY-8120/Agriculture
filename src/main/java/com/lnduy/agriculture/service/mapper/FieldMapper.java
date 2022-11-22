@@ -15,7 +15,7 @@ public interface FieldMapper extends EntityMapper<FieldDTO, Field> {
     FieldDTO toDto(Field s);
 
     @Named("soilTypeId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     SoilTypeDTO toDtoSoilTypeId(SoilType soilType);
 }

@@ -31,8 +31,18 @@ public class Supplies implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "volume")
+    private Float volume;
+
+    @Column(name = "unit")
+    private String unit;
+
     @Column(name = "enable")
     private Integer enable;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "supplies", "protectionProducts", "fertilizers", "crops" }, allowSetters = true)
+    private Warehouse warehouse;
 
     @ManyToMany(mappedBy = "supplies")
     @JsonIgnoreProperties(value = { "season", "employees", "supplies", "protectionproducts", "fertilizers" }, allowSetters = true)
@@ -92,6 +102,32 @@ public class Supplies implements Serializable {
         this.type = type;
     }
 
+    public Float getVolume() {
+        return this.volume;
+    }
+
+    public Supplies volume(Float volume) {
+        this.setVolume(volume);
+        return this;
+    }
+
+    public void setVolume(Float volume) {
+        this.volume = volume;
+    }
+
+    public String getUnit() {
+        return this.unit;
+    }
+
+    public Supplies unit(String unit) {
+        this.setUnit(unit);
+        return this;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public Integer getEnable() {
         return this.enable;
     }
@@ -103,6 +139,19 @@ public class Supplies implements Serializable {
 
     public void setEnable(Integer enable) {
         this.enable = enable;
+    }
+
+    public Warehouse getWarehouse() {
+        return this.warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
+    }
+
+    public Supplies warehouse(Warehouse warehouse) {
+        this.setWarehouse(warehouse);
+        return this;
     }
 
     public Set<Task> getTasks() {
@@ -163,6 +212,8 @@ public class Supplies implements Serializable {
             ", name='" + getName() + "'" +
             ", property='" + getProperty() + "'" +
             ", type='" + getType() + "'" +
+            ", volume=" + getVolume() +
+            ", unit='" + getUnit() + "'" +
             ", enable=" + getEnable() +
             "}";
     }

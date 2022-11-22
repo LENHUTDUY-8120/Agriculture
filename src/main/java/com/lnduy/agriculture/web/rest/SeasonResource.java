@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.SeasonRepository;
+import com.lnduy.agriculture.service.SeasonQueryService;
 import com.lnduy.agriculture.service.SeasonService;
+import com.lnduy.agriculture.service.criteria.SeasonCriteria;
 import com.lnduy.agriculture.service.dto.SeasonDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,12 @@ public class SeasonResource {
 
     private final SeasonRepository seasonRepository;
 
-    public SeasonResource(SeasonService seasonService, SeasonRepository seasonRepository) {
+    private final SeasonQueryService seasonQueryService;
+
+    public SeasonResource(SeasonService seasonService, SeasonRepository seasonRepository, SeasonQueryService seasonQueryService) {
         this.seasonService = seasonService;
         this.seasonRepository = seasonRepository;
+        this.seasonQueryService = seasonQueryService;
     }
 
     /**
@@ -140,14 +144,30 @@ public class SeasonResource {
      * {@code GET  /seasons} : get all the seasons.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of seasons in body.
      */
     @GetMapping("/seasons")
-    public ResponseEntity<List<SeasonDTO>> getAllSeasons(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Seasons");
-        Page<SeasonDTO> page = seasonService.findAll(pageable);
+    public ResponseEntity<List<SeasonDTO>> getAllSeasons(
+        SeasonCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Seasons by criteria: {}", criteria);
+        Page<SeasonDTO> page = seasonQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /seasons/count} : count all the seasons.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/seasons/count")
+    public ResponseEntity<Long> countSeasons(SeasonCriteria criteria) {
+        log.debug("REST request to count Seasons by criteria: {}", criteria);
+        return ResponseEntity.ok().body(seasonQueryService.countByCriteria(criteria));
     }
 
     /**

@@ -33,14 +33,15 @@
       "EventCategory",
       "Task",
       "Employee",
-      "Transaction"
+      "Transaction",
+      "Warehouse"
     ],
     "entitySuffix": "",
     "jhiPrefix": "jhi",
     "jhipsterVersion": "7.9.3",
     "jwtSecretKey": "MGJmNzM0M2JhN2ExNDc1NGJkOWZkNTY5ZGJjZmQ1ZGVkODVhNGI3OGU4MWMzZDcyOWVkN2U1ZjEzZDM3ODhkZGJjYTlhODdjYWFiNDIyNTBlNjY0NTA4MjlkYjgwOTJkODA1YTNhOWEwZDQ5MDQ0MDNlNmI2YzYyZmE2MWU2ZDg=",
     "languages": ["en", "fr"],
-    "lastLiquibaseTimestamp": 1668814578000,
+    "lastLiquibaseTimestamp": 1668892190000,
     "messageBroker": false,
     "microfrontend": false,
     "microfrontends": [],

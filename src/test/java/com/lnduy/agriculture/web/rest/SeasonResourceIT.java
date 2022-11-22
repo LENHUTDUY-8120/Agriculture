@@ -7,8 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.lnduy.agriculture.IntegrationTest;
+import com.lnduy.agriculture.domain.Crops;
+import com.lnduy.agriculture.domain.Field;
 import com.lnduy.agriculture.domain.Season;
+import com.lnduy.agriculture.domain.Transaction;
 import com.lnduy.agriculture.repository.SeasonRepository;
+import com.lnduy.agriculture.service.criteria.SeasonCriteria;
 import com.lnduy.agriculture.service.dto.SeasonDTO;
 import com.lnduy.agriculture.service.mapper.SeasonMapper;
 import java.time.Instant;
@@ -41,21 +45,30 @@ class SeasonResourceIT {
 
     private static final Double DEFAULT_TOTAL_COST = 1D;
     private static final Double UPDATED_TOTAL_COST = 2D;
+    private static final Double SMALLER_TOTAL_COST = 1D - 1D;
 
     private static final Double DEFAULT_CROP_YIELDS = 1D;
     private static final Double UPDATED_CROP_YIELDS = 2D;
+    private static final Double SMALLER_CROP_YIELDS = 1D - 1D;
+
+    private static final Integer DEFAULT_ENABLE = 1;
+    private static final Integer UPDATED_ENABLE = 2;
+    private static final Integer SMALLER_ENABLE = 1 - 1;
 
     private static final String DEFAULT_UNIT = "AAAAAAAAAA";
     private static final String UPDATED_UNIT = "BBBBBBBBBB";
 
     private static final Integer DEFAULT_DONE = 1;
     private static final Integer UPDATED_DONE = 2;
+    private static final Integer SMALLER_DONE = 1 - 1;
 
     private static final ZonedDateTime DEFAULT_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_START_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final ZonedDateTime SMALLER_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
     private static final ZonedDateTime DEFAULT_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_END_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final ZonedDateTime SMALLER_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
     private static final String ENTITY_API_URL = "/api/seasons";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -88,6 +101,7 @@ class SeasonResourceIT {
             .crops(DEFAULT_CROPS)
             .totalCost(DEFAULT_TOTAL_COST)
             .cropYields(DEFAULT_CROP_YIELDS)
+            .enable(DEFAULT_ENABLE)
             .unit(DEFAULT_UNIT)
             .done(DEFAULT_DONE)
             .startAt(DEFAULT_START_AT)
@@ -106,6 +120,7 @@ class SeasonResourceIT {
             .crops(UPDATED_CROPS)
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
+            .enable(UPDATED_ENABLE)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -135,6 +150,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getCrops()).isEqualTo(DEFAULT_CROPS);
         assertThat(testSeason.getTotalCost()).isEqualTo(DEFAULT_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(DEFAULT_CROP_YIELDS);
+        assertThat(testSeason.getEnable()).isEqualTo(DEFAULT_ENABLE);
         assertThat(testSeason.getUnit()).isEqualTo(DEFAULT_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(DEFAULT_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(DEFAULT_START_AT);
@@ -175,6 +191,7 @@ class SeasonResourceIT {
             .andExpect(jsonPath("$.[*].crops").value(hasItem(DEFAULT_CROPS)))
             .andExpect(jsonPath("$.[*].totalCost").value(hasItem(DEFAULT_TOTAL_COST.doubleValue())))
             .andExpect(jsonPath("$.[*].cropYields").value(hasItem(DEFAULT_CROP_YIELDS.doubleValue())))
+            .andExpect(jsonPath("$.[*].enable").value(hasItem(DEFAULT_ENABLE)))
             .andExpect(jsonPath("$.[*].unit").value(hasItem(DEFAULT_UNIT)))
             .andExpect(jsonPath("$.[*].done").value(hasItem(DEFAULT_DONE)))
             .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
@@ -196,10 +213,819 @@ class SeasonResourceIT {
             .andExpect(jsonPath("$.crops").value(DEFAULT_CROPS))
             .andExpect(jsonPath("$.totalCost").value(DEFAULT_TOTAL_COST.doubleValue()))
             .andExpect(jsonPath("$.cropYields").value(DEFAULT_CROP_YIELDS.doubleValue()))
+            .andExpect(jsonPath("$.enable").value(DEFAULT_ENABLE))
             .andExpect(jsonPath("$.unit").value(DEFAULT_UNIT))
             .andExpect(jsonPath("$.done").value(DEFAULT_DONE))
             .andExpect(jsonPath("$.startAt").value(sameInstant(DEFAULT_START_AT)))
             .andExpect(jsonPath("$.endAt").value(sameInstant(DEFAULT_END_AT)));
+    }
+
+    @Test
+    @Transactional
+    void getSeasonsByIdFiltering() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        Long id = season.getId();
+
+        defaultSeasonShouldBeFound("id.equals=" + id);
+        defaultSeasonShouldNotBeFound("id.notEquals=" + id);
+
+        defaultSeasonShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultSeasonShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultSeasonShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultSeasonShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where crops equals to DEFAULT_CROPS
+        defaultSeasonShouldBeFound("crops.equals=" + DEFAULT_CROPS);
+
+        // Get all the seasonList where crops equals to UPDATED_CROPS
+        defaultSeasonShouldNotBeFound("crops.equals=" + UPDATED_CROPS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropsIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where crops in DEFAULT_CROPS or UPDATED_CROPS
+        defaultSeasonShouldBeFound("crops.in=" + DEFAULT_CROPS + "," + UPDATED_CROPS);
+
+        // Get all the seasonList where crops equals to UPDATED_CROPS
+        defaultSeasonShouldNotBeFound("crops.in=" + UPDATED_CROPS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropsIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where crops is not null
+        defaultSeasonShouldBeFound("crops.specified=true");
+
+        // Get all the seasonList where crops is null
+        defaultSeasonShouldNotBeFound("crops.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropsContainsSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where crops contains DEFAULT_CROPS
+        defaultSeasonShouldBeFound("crops.contains=" + DEFAULT_CROPS);
+
+        // Get all the seasonList where crops contains UPDATED_CROPS
+        defaultSeasonShouldNotBeFound("crops.contains=" + UPDATED_CROPS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropsNotContainsSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where crops does not contain DEFAULT_CROPS
+        defaultSeasonShouldNotBeFound("crops.doesNotContain=" + DEFAULT_CROPS);
+
+        // Get all the seasonList where crops does not contain UPDATED_CROPS
+        defaultSeasonShouldBeFound("crops.doesNotContain=" + UPDATED_CROPS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost equals to DEFAULT_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.equals=" + DEFAULT_TOTAL_COST);
+
+        // Get all the seasonList where totalCost equals to UPDATED_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.equals=" + UPDATED_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost in DEFAULT_TOTAL_COST or UPDATED_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.in=" + DEFAULT_TOTAL_COST + "," + UPDATED_TOTAL_COST);
+
+        // Get all the seasonList where totalCost equals to UPDATED_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.in=" + UPDATED_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost is not null
+        defaultSeasonShouldBeFound("totalCost.specified=true");
+
+        // Get all the seasonList where totalCost is null
+        defaultSeasonShouldNotBeFound("totalCost.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost is greater than or equal to DEFAULT_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.greaterThanOrEqual=" + DEFAULT_TOTAL_COST);
+
+        // Get all the seasonList where totalCost is greater than or equal to UPDATED_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.greaterThanOrEqual=" + UPDATED_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost is less than or equal to DEFAULT_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.lessThanOrEqual=" + DEFAULT_TOTAL_COST);
+
+        // Get all the seasonList where totalCost is less than or equal to SMALLER_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.lessThanOrEqual=" + SMALLER_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost is less than DEFAULT_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.lessThan=" + DEFAULT_TOTAL_COST);
+
+        // Get all the seasonList where totalCost is less than UPDATED_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.lessThan=" + UPDATED_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTotalCostIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where totalCost is greater than DEFAULT_TOTAL_COST
+        defaultSeasonShouldNotBeFound("totalCost.greaterThan=" + DEFAULT_TOTAL_COST);
+
+        // Get all the seasonList where totalCost is greater than SMALLER_TOTAL_COST
+        defaultSeasonShouldBeFound("totalCost.greaterThan=" + SMALLER_TOTAL_COST);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields equals to DEFAULT_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.equals=" + DEFAULT_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields equals to UPDATED_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.equals=" + UPDATED_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields in DEFAULT_CROP_YIELDS or UPDATED_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.in=" + DEFAULT_CROP_YIELDS + "," + UPDATED_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields equals to UPDATED_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.in=" + UPDATED_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields is not null
+        defaultSeasonShouldBeFound("cropYields.specified=true");
+
+        // Get all the seasonList where cropYields is null
+        defaultSeasonShouldNotBeFound("cropYields.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields is greater than or equal to DEFAULT_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.greaterThanOrEqual=" + DEFAULT_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields is greater than or equal to UPDATED_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.greaterThanOrEqual=" + UPDATED_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields is less than or equal to DEFAULT_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.lessThanOrEqual=" + DEFAULT_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields is less than or equal to SMALLER_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.lessThanOrEqual=" + SMALLER_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields is less than DEFAULT_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.lessThan=" + DEFAULT_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields is less than UPDATED_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.lessThan=" + UPDATED_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropYieldsIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where cropYields is greater than DEFAULT_CROP_YIELDS
+        defaultSeasonShouldNotBeFound("cropYields.greaterThan=" + DEFAULT_CROP_YIELDS);
+
+        // Get all the seasonList where cropYields is greater than SMALLER_CROP_YIELDS
+        defaultSeasonShouldBeFound("cropYields.greaterThan=" + SMALLER_CROP_YIELDS);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable equals to DEFAULT_ENABLE
+        defaultSeasonShouldBeFound("enable.equals=" + DEFAULT_ENABLE);
+
+        // Get all the seasonList where enable equals to UPDATED_ENABLE
+        defaultSeasonShouldNotBeFound("enable.equals=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable in DEFAULT_ENABLE or UPDATED_ENABLE
+        defaultSeasonShouldBeFound("enable.in=" + DEFAULT_ENABLE + "," + UPDATED_ENABLE);
+
+        // Get all the seasonList where enable equals to UPDATED_ENABLE
+        defaultSeasonShouldNotBeFound("enable.in=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable is not null
+        defaultSeasonShouldBeFound("enable.specified=true");
+
+        // Get all the seasonList where enable is null
+        defaultSeasonShouldNotBeFound("enable.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable is greater than or equal to DEFAULT_ENABLE
+        defaultSeasonShouldBeFound("enable.greaterThanOrEqual=" + DEFAULT_ENABLE);
+
+        // Get all the seasonList where enable is greater than or equal to UPDATED_ENABLE
+        defaultSeasonShouldNotBeFound("enable.greaterThanOrEqual=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable is less than or equal to DEFAULT_ENABLE
+        defaultSeasonShouldBeFound("enable.lessThanOrEqual=" + DEFAULT_ENABLE);
+
+        // Get all the seasonList where enable is less than or equal to SMALLER_ENABLE
+        defaultSeasonShouldNotBeFound("enable.lessThanOrEqual=" + SMALLER_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable is less than DEFAULT_ENABLE
+        defaultSeasonShouldNotBeFound("enable.lessThan=" + DEFAULT_ENABLE);
+
+        // Get all the seasonList where enable is less than UPDATED_ENABLE
+        defaultSeasonShouldBeFound("enable.lessThan=" + UPDATED_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEnableIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where enable is greater than DEFAULT_ENABLE
+        defaultSeasonShouldNotBeFound("enable.greaterThan=" + DEFAULT_ENABLE);
+
+        // Get all the seasonList where enable is greater than SMALLER_ENABLE
+        defaultSeasonShouldBeFound("enable.greaterThan=" + SMALLER_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByUnitIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where unit equals to DEFAULT_UNIT
+        defaultSeasonShouldBeFound("unit.equals=" + DEFAULT_UNIT);
+
+        // Get all the seasonList where unit equals to UPDATED_UNIT
+        defaultSeasonShouldNotBeFound("unit.equals=" + UPDATED_UNIT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByUnitIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where unit in DEFAULT_UNIT or UPDATED_UNIT
+        defaultSeasonShouldBeFound("unit.in=" + DEFAULT_UNIT + "," + UPDATED_UNIT);
+
+        // Get all the seasonList where unit equals to UPDATED_UNIT
+        defaultSeasonShouldNotBeFound("unit.in=" + UPDATED_UNIT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByUnitIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where unit is not null
+        defaultSeasonShouldBeFound("unit.specified=true");
+
+        // Get all the seasonList where unit is null
+        defaultSeasonShouldNotBeFound("unit.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByUnitContainsSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where unit contains DEFAULT_UNIT
+        defaultSeasonShouldBeFound("unit.contains=" + DEFAULT_UNIT);
+
+        // Get all the seasonList where unit contains UPDATED_UNIT
+        defaultSeasonShouldNotBeFound("unit.contains=" + UPDATED_UNIT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByUnitNotContainsSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where unit does not contain DEFAULT_UNIT
+        defaultSeasonShouldNotBeFound("unit.doesNotContain=" + DEFAULT_UNIT);
+
+        // Get all the seasonList where unit does not contain UPDATED_UNIT
+        defaultSeasonShouldBeFound("unit.doesNotContain=" + UPDATED_UNIT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done equals to DEFAULT_DONE
+        defaultSeasonShouldBeFound("done.equals=" + DEFAULT_DONE);
+
+        // Get all the seasonList where done equals to UPDATED_DONE
+        defaultSeasonShouldNotBeFound("done.equals=" + UPDATED_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done in DEFAULT_DONE or UPDATED_DONE
+        defaultSeasonShouldBeFound("done.in=" + DEFAULT_DONE + "," + UPDATED_DONE);
+
+        // Get all the seasonList where done equals to UPDATED_DONE
+        defaultSeasonShouldNotBeFound("done.in=" + UPDATED_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done is not null
+        defaultSeasonShouldBeFound("done.specified=true");
+
+        // Get all the seasonList where done is null
+        defaultSeasonShouldNotBeFound("done.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done is greater than or equal to DEFAULT_DONE
+        defaultSeasonShouldBeFound("done.greaterThanOrEqual=" + DEFAULT_DONE);
+
+        // Get all the seasonList where done is greater than or equal to UPDATED_DONE
+        defaultSeasonShouldNotBeFound("done.greaterThanOrEqual=" + UPDATED_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done is less than or equal to DEFAULT_DONE
+        defaultSeasonShouldBeFound("done.lessThanOrEqual=" + DEFAULT_DONE);
+
+        // Get all the seasonList where done is less than or equal to SMALLER_DONE
+        defaultSeasonShouldNotBeFound("done.lessThanOrEqual=" + SMALLER_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done is less than DEFAULT_DONE
+        defaultSeasonShouldNotBeFound("done.lessThan=" + DEFAULT_DONE);
+
+        // Get all the seasonList where done is less than UPDATED_DONE
+        defaultSeasonShouldBeFound("done.lessThan=" + UPDATED_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByDoneIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where done is greater than DEFAULT_DONE
+        defaultSeasonShouldNotBeFound("done.greaterThan=" + DEFAULT_DONE);
+
+        // Get all the seasonList where done is greater than SMALLER_DONE
+        defaultSeasonShouldBeFound("done.greaterThan=" + SMALLER_DONE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt equals to DEFAULT_START_AT
+        defaultSeasonShouldBeFound("startAt.equals=" + DEFAULT_START_AT);
+
+        // Get all the seasonList where startAt equals to UPDATED_START_AT
+        defaultSeasonShouldNotBeFound("startAt.equals=" + UPDATED_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt in DEFAULT_START_AT or UPDATED_START_AT
+        defaultSeasonShouldBeFound("startAt.in=" + DEFAULT_START_AT + "," + UPDATED_START_AT);
+
+        // Get all the seasonList where startAt equals to UPDATED_START_AT
+        defaultSeasonShouldNotBeFound("startAt.in=" + UPDATED_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt is not null
+        defaultSeasonShouldBeFound("startAt.specified=true");
+
+        // Get all the seasonList where startAt is null
+        defaultSeasonShouldNotBeFound("startAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt is greater than or equal to DEFAULT_START_AT
+        defaultSeasonShouldBeFound("startAt.greaterThanOrEqual=" + DEFAULT_START_AT);
+
+        // Get all the seasonList where startAt is greater than or equal to UPDATED_START_AT
+        defaultSeasonShouldNotBeFound("startAt.greaterThanOrEqual=" + UPDATED_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt is less than or equal to DEFAULT_START_AT
+        defaultSeasonShouldBeFound("startAt.lessThanOrEqual=" + DEFAULT_START_AT);
+
+        // Get all the seasonList where startAt is less than or equal to SMALLER_START_AT
+        defaultSeasonShouldNotBeFound("startAt.lessThanOrEqual=" + SMALLER_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt is less than DEFAULT_START_AT
+        defaultSeasonShouldNotBeFound("startAt.lessThan=" + DEFAULT_START_AT);
+
+        // Get all the seasonList where startAt is less than UPDATED_START_AT
+        defaultSeasonShouldBeFound("startAt.lessThan=" + UPDATED_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByStartAtIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where startAt is greater than DEFAULT_START_AT
+        defaultSeasonShouldNotBeFound("startAt.greaterThan=" + DEFAULT_START_AT);
+
+        // Get all the seasonList where startAt is greater than SMALLER_START_AT
+        defaultSeasonShouldBeFound("startAt.greaterThan=" + SMALLER_START_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt equals to DEFAULT_END_AT
+        defaultSeasonShouldBeFound("endAt.equals=" + DEFAULT_END_AT);
+
+        // Get all the seasonList where endAt equals to UPDATED_END_AT
+        defaultSeasonShouldNotBeFound("endAt.equals=" + UPDATED_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt in DEFAULT_END_AT or UPDATED_END_AT
+        defaultSeasonShouldBeFound("endAt.in=" + DEFAULT_END_AT + "," + UPDATED_END_AT);
+
+        // Get all the seasonList where endAt equals to UPDATED_END_AT
+        defaultSeasonShouldNotBeFound("endAt.in=" + UPDATED_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt is not null
+        defaultSeasonShouldBeFound("endAt.specified=true");
+
+        // Get all the seasonList where endAt is null
+        defaultSeasonShouldNotBeFound("endAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt is greater than or equal to DEFAULT_END_AT
+        defaultSeasonShouldBeFound("endAt.greaterThanOrEqual=" + DEFAULT_END_AT);
+
+        // Get all the seasonList where endAt is greater than or equal to UPDATED_END_AT
+        defaultSeasonShouldNotBeFound("endAt.greaterThanOrEqual=" + UPDATED_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt is less than or equal to DEFAULT_END_AT
+        defaultSeasonShouldBeFound("endAt.lessThanOrEqual=" + DEFAULT_END_AT);
+
+        // Get all the seasonList where endAt is less than or equal to SMALLER_END_AT
+        defaultSeasonShouldNotBeFound("endAt.lessThanOrEqual=" + SMALLER_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt is less than DEFAULT_END_AT
+        defaultSeasonShouldNotBeFound("endAt.lessThan=" + DEFAULT_END_AT);
+
+        // Get all the seasonList where endAt is less than UPDATED_END_AT
+        defaultSeasonShouldBeFound("endAt.lessThan=" + UPDATED_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByEndAtIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where endAt is greater than DEFAULT_END_AT
+        defaultSeasonShouldNotBeFound("endAt.greaterThan=" + DEFAULT_END_AT);
+
+        // Get all the seasonList where endAt is greater than SMALLER_END_AT
+        defaultSeasonShouldBeFound("endAt.greaterThan=" + SMALLER_END_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByTransactionIsEqualToSomething() throws Exception {
+        Transaction transaction;
+        if (TestUtil.findAll(em, Transaction.class).isEmpty()) {
+            seasonRepository.saveAndFlush(season);
+            transaction = TransactionResourceIT.createEntity(em);
+        } else {
+            transaction = TestUtil.findAll(em, Transaction.class).get(0);
+        }
+        em.persist(transaction);
+        em.flush();
+        season.addTransaction(transaction);
+        seasonRepository.saveAndFlush(season);
+        Long transactionId = transaction.getId();
+
+        // Get all the seasonList where transaction equals to transactionId
+        defaultSeasonShouldBeFound("transactionId.equals=" + transactionId);
+
+        // Get all the seasonList where transaction equals to (transactionId + 1)
+        defaultSeasonShouldNotBeFound("transactionId.equals=" + (transactionId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByCropIsEqualToSomething() throws Exception {
+        Crops crop;
+        if (TestUtil.findAll(em, Crops.class).isEmpty()) {
+            seasonRepository.saveAndFlush(season);
+            crop = CropsResourceIT.createEntity(em);
+        } else {
+            crop = TestUtil.findAll(em, Crops.class).get(0);
+        }
+        em.persist(crop);
+        em.flush();
+        season.setCrop(crop);
+        seasonRepository.saveAndFlush(season);
+        Long cropId = crop.getId();
+
+        // Get all the seasonList where crop equals to cropId
+        defaultSeasonShouldBeFound("cropId.equals=" + cropId);
+
+        // Get all the seasonList where crop equals to (cropId + 1)
+        defaultSeasonShouldNotBeFound("cropId.equals=" + (cropId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByFieldIsEqualToSomething() throws Exception {
+        Field field;
+        if (TestUtil.findAll(em, Field.class).isEmpty()) {
+            seasonRepository.saveAndFlush(season);
+            field = FieldResourceIT.createEntity(em);
+        } else {
+            field = TestUtil.findAll(em, Field.class).get(0);
+        }
+        em.persist(field);
+        em.flush();
+        season.setField(field);
+        seasonRepository.saveAndFlush(season);
+        Long fieldId = field.getId();
+
+        // Get all the seasonList where field equals to fieldId
+        defaultSeasonShouldBeFound("fieldId.equals=" + fieldId);
+
+        // Get all the seasonList where field equals to (fieldId + 1)
+        defaultSeasonShouldNotBeFound("fieldId.equals=" + (fieldId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultSeasonShouldBeFound(String filter) throws Exception {
+        restSeasonMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(season.getId().intValue())))
+            .andExpect(jsonPath("$.[*].crops").value(hasItem(DEFAULT_CROPS)))
+            .andExpect(jsonPath("$.[*].totalCost").value(hasItem(DEFAULT_TOTAL_COST.doubleValue())))
+            .andExpect(jsonPath("$.[*].cropYields").value(hasItem(DEFAULT_CROP_YIELDS.doubleValue())))
+            .andExpect(jsonPath("$.[*].enable").value(hasItem(DEFAULT_ENABLE)))
+            .andExpect(jsonPath("$.[*].unit").value(hasItem(DEFAULT_UNIT)))
+            .andExpect(jsonPath("$.[*].done").value(hasItem(DEFAULT_DONE)))
+            .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
+            .andExpect(jsonPath("$.[*].endAt").value(hasItem(sameInstant(DEFAULT_END_AT))));
+
+        // Check, that the count call also returns 1
+        restSeasonMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultSeasonShouldNotBeFound(String filter) throws Exception {
+        restSeasonMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restSeasonMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test
@@ -225,6 +1051,7 @@ class SeasonResourceIT {
             .crops(UPDATED_CROPS)
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
+            .enable(UPDATED_ENABLE)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -246,6 +1073,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getCrops()).isEqualTo(UPDATED_CROPS);
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(UPDATED_CROP_YIELDS);
+        assertThat(testSeason.getEnable()).isEqualTo(UPDATED_ENABLE);
         assertThat(testSeason.getUnit()).isEqualTo(UPDATED_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(UPDATED_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);
@@ -329,7 +1157,7 @@ class SeasonResourceIT {
         Season partialUpdatedSeason = new Season();
         partialUpdatedSeason.setId(season.getId());
 
-        partialUpdatedSeason.totalCost(UPDATED_TOTAL_COST).endAt(UPDATED_END_AT);
+        partialUpdatedSeason.totalCost(UPDATED_TOTAL_COST).startAt(UPDATED_START_AT).endAt(UPDATED_END_AT);
 
         restSeasonMockMvc
             .perform(
@@ -346,9 +1174,10 @@ class SeasonResourceIT {
         assertThat(testSeason.getCrops()).isEqualTo(DEFAULT_CROPS);
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(DEFAULT_CROP_YIELDS);
+        assertThat(testSeason.getEnable()).isEqualTo(DEFAULT_ENABLE);
         assertThat(testSeason.getUnit()).isEqualTo(DEFAULT_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(DEFAULT_DONE);
-        assertThat(testSeason.getStartAt()).isEqualTo(DEFAULT_START_AT);
+        assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);
         assertThat(testSeason.getEndAt()).isEqualTo(UPDATED_END_AT);
     }
 
@@ -368,6 +1197,7 @@ class SeasonResourceIT {
             .crops(UPDATED_CROPS)
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
+            .enable(UPDATED_ENABLE)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -388,6 +1218,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getCrops()).isEqualTo(UPDATED_CROPS);
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(UPDATED_CROP_YIELDS);
+        assertThat(testSeason.getEnable()).isEqualTo(UPDATED_ENABLE);
         assertThat(testSeason.getUnit()).isEqualTo(UPDATED_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(UPDATED_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);

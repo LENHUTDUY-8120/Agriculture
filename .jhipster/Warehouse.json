@@ -1,0 +1,65 @@
+{
+  "applications": "*",
+  "changelogDate": "20221119210950",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "warehouse",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "area",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "latitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "longitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "enable",
+      "fieldType": "Integer"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": true,
+  "name": "Warehouse",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "supplies",
+      "otherEntityRelationshipName": "warehouse",
+      "relationshipName": "supplies",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "protectionProduct",
+      "otherEntityRelationshipName": "warehouse",
+      "relationshipName": "protectionProduct",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "fertilizers",
+      "otherEntityRelationshipName": "warehouse",
+      "relationshipName": "fertilizers",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "crops",
+      "otherEntityRelationshipName": "warehouse",
+      "relationshipName": "crops",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceImpl"
+}

@@ -18,6 +18,10 @@
       "fieldType": "Double"
     },
     {
+      "fieldName": "enable",
+      "fieldType": "Integer"
+    },
+    {
       "fieldName": "unit",
       "fieldType": "String"
     },
@@ -35,7 +39,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Season",
   "pagination": "pagination",
   "readOnly": false,

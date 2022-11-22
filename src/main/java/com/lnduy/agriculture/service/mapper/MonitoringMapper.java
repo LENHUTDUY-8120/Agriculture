@@ -18,12 +18,12 @@ public interface MonitoringMapper extends EntityMapper<MonitoringDTO, Monitoring
     MonitoringDTO toDto(Monitoring s);
 
     @Named("fieldId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     FieldDTO toDtoFieldId(Field field);
 
     @Named("deviceId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     DeviceDTO toDtoDeviceId(Device device);
 }

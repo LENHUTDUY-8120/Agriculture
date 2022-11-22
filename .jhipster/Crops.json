@@ -20,13 +20,24 @@
     {
       "fieldName": "description",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "enable",
+      "fieldType": "Integer"
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Crops",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "warehouse",
+      "otherEntityRelationshipName": "crops",
+      "relationshipName": "warehouse",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "service": "serviceImpl"
 }

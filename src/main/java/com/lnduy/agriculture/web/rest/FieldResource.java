@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.FieldRepository;
+import com.lnduy.agriculture.service.FieldQueryService;
 import com.lnduy.agriculture.service.FieldService;
+import com.lnduy.agriculture.service.criteria.FieldCriteria;
 import com.lnduy.agriculture.service.dto.FieldDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,12 @@ public class FieldResource {
 
     private final FieldRepository fieldRepository;
 
-    public FieldResource(FieldService fieldService, FieldRepository fieldRepository) {
+    private final FieldQueryService fieldQueryService;
+
+    public FieldResource(FieldService fieldService, FieldRepository fieldRepository, FieldQueryService fieldQueryService) {
         this.fieldService = fieldService;
         this.fieldRepository = fieldRepository;
+        this.fieldQueryService = fieldQueryService;
     }
 
     /**
@@ -133,12 +138,26 @@ public class FieldResource {
     /**
      * {@code GET  /fields} : get all the fields.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of fields in body.
      */
     @GetMapping("/fields")
-    public List<FieldDTO> getAllFields() {
-        log.debug("REST request to get all Fields");
-        return fieldService.findAll();
+    public ResponseEntity<List<FieldDTO>> getAllFields(FieldCriteria criteria) {
+        log.debug("REST request to get Fields by criteria: {}", criteria);
+        List<FieldDTO> entityList = fieldQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /fields/count} : count all the fields.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/fields/count")
+    public ResponseEntity<Long> countFields(FieldCriteria criteria) {
+        log.debug("REST request to count Fields by criteria: {}", criteria);
+        return ResponseEntity.ok().body(fieldQueryService.countByCriteria(criteria));
     }
 
     /**

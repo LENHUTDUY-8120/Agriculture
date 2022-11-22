@@ -11,7 +11,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "EventCategory",
   "pagination": "no",
   "readOnly": false,

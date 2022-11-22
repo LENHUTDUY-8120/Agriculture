@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.EventCategoryRepository;
+import com.lnduy.agriculture.service.EventCategoryQueryService;
 import com.lnduy.agriculture.service.EventCategoryService;
+import com.lnduy.agriculture.service.criteria.EventCategoryCriteria;
 import com.lnduy.agriculture.service.dto.EventCategoryDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,16 @@ public class EventCategoryResource {
 
     private final EventCategoryRepository eventCategoryRepository;
 
-    public EventCategoryResource(EventCategoryService eventCategoryService, EventCategoryRepository eventCategoryRepository) {
+    private final EventCategoryQueryService eventCategoryQueryService;
+
+    public EventCategoryResource(
+        EventCategoryService eventCategoryService,
+        EventCategoryRepository eventCategoryRepository,
+        EventCategoryQueryService eventCategoryQueryService
+    ) {
         this.eventCategoryService = eventCategoryService;
         this.eventCategoryRepository = eventCategoryRepository;
+        this.eventCategoryQueryService = eventCategoryQueryService;
     }
 
     /**
@@ -133,12 +142,26 @@ public class EventCategoryResource {
     /**
      * {@code GET  /event-categories} : get all the eventCategories.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of eventCategories in body.
      */
     @GetMapping("/event-categories")
-    public List<EventCategoryDTO> getAllEventCategories() {
-        log.debug("REST request to get all EventCategories");
-        return eventCategoryService.findAll();
+    public ResponseEntity<List<EventCategoryDTO>> getAllEventCategories(EventCategoryCriteria criteria) {
+        log.debug("REST request to get EventCategories by criteria: {}", criteria);
+        List<EventCategoryDTO> entityList = eventCategoryQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /event-categories/count} : count all the eventCategories.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/event-categories/count")
+    public ResponseEntity<Long> countEventCategories(EventCategoryCriteria criteria) {
+        log.debug("REST request to count EventCategories by criteria: {}", criteria);
+        return ResponseEntity.ok().body(eventCategoryQueryService.countByCriteria(criteria));
     }
 
     /**

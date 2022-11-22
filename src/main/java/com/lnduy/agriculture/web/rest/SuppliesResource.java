@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.SuppliesRepository;
+import com.lnduy.agriculture.service.SuppliesQueryService;
 import com.lnduy.agriculture.service.SuppliesService;
+import com.lnduy.agriculture.service.criteria.SuppliesCriteria;
 import com.lnduy.agriculture.service.dto.SuppliesDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,16 @@ public class SuppliesResource {
 
     private final SuppliesRepository suppliesRepository;
 
-    public SuppliesResource(SuppliesService suppliesService, SuppliesRepository suppliesRepository) {
+    private final SuppliesQueryService suppliesQueryService;
+
+    public SuppliesResource(
+        SuppliesService suppliesService,
+        SuppliesRepository suppliesRepository,
+        SuppliesQueryService suppliesQueryService
+    ) {
         this.suppliesService = suppliesService;
         this.suppliesRepository = suppliesRepository;
+        this.suppliesQueryService = suppliesQueryService;
     }
 
     /**
@@ -140,14 +148,30 @@ public class SuppliesResource {
      * {@code GET  /supplies} : get all the supplies.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of supplies in body.
      */
     @GetMapping("/supplies")
-    public ResponseEntity<List<SuppliesDTO>> getAllSupplies(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Supplies");
-        Page<SuppliesDTO> page = suppliesService.findAll(pageable);
+    public ResponseEntity<List<SuppliesDTO>> getAllSupplies(
+        SuppliesCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Supplies by criteria: {}", criteria);
+        Page<SuppliesDTO> page = suppliesQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /supplies/count} : count all the supplies.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/supplies/count")
+    public ResponseEntity<Long> countSupplies(SuppliesCriteria criteria) {
+        log.debug("REST request to count Supplies by criteria: {}", criteria);
+        return ResponseEntity.ok().body(suppliesQueryService.countByCriteria(criteria));
     }
 
     /**

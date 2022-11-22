@@ -18,12 +18,12 @@ public interface SeasonMapper extends EntityMapper<SeasonDTO, Season> {
     SeasonDTO toDto(Season s);
 
     @Named("cropsId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     CropsDTO toDtoCropsId(Crops crops);
 
     @Named("fieldId")
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = false)
     @Mapping(target = "id", source = "id")
     FieldDTO toDtoFieldId(Field field);
 }

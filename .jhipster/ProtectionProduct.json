@@ -31,11 +31,17 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "ProtectionProduct",
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [
+    {
+      "otherEntityName": "warehouse",
+      "otherEntityRelationshipName": "protectionProduct",
+      "relationshipName": "warehouse",
+      "relationshipType": "many-to-one"
+    },
     {
       "otherEntityName": "task",
       "otherEntityRelationshipName": "protectionproduct",

@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.SoilTypeRepository;
+import com.lnduy.agriculture.service.SoilTypeQueryService;
 import com.lnduy.agriculture.service.SoilTypeService;
+import com.lnduy.agriculture.service.criteria.SoilTypeCriteria;
 import com.lnduy.agriculture.service.dto.SoilTypeDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,16 @@ public class SoilTypeResource {
 
     private final SoilTypeRepository soilTypeRepository;
 
-    public SoilTypeResource(SoilTypeService soilTypeService, SoilTypeRepository soilTypeRepository) {
+    private final SoilTypeQueryService soilTypeQueryService;
+
+    public SoilTypeResource(
+        SoilTypeService soilTypeService,
+        SoilTypeRepository soilTypeRepository,
+        SoilTypeQueryService soilTypeQueryService
+    ) {
         this.soilTypeService = soilTypeService;
         this.soilTypeRepository = soilTypeRepository;
+        this.soilTypeQueryService = soilTypeQueryService;
     }
 
     /**
@@ -133,12 +142,26 @@ public class SoilTypeResource {
     /**
      * {@code GET  /soil-types} : get all the soilTypes.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of soilTypes in body.
      */
     @GetMapping("/soil-types")
-    public List<SoilTypeDTO> getAllSoilTypes() {
-        log.debug("REST request to get all SoilTypes");
-        return soilTypeService.findAll();
+    public ResponseEntity<List<SoilTypeDTO>> getAllSoilTypes(SoilTypeCriteria criteria) {
+        log.debug("REST request to get SoilTypes by criteria: {}", criteria);
+        List<SoilTypeDTO> entityList = soilTypeQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /soil-types/count} : count all the soilTypes.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/soil-types/count")
+    public ResponseEntity<Long> countSoilTypes(SoilTypeCriteria criteria) {
+        log.debug("REST request to count SoilTypes by criteria: {}", criteria);
+        return ResponseEntity.ok().body(soilTypeQueryService.countByCriteria(criteria));
     }
 
     /**

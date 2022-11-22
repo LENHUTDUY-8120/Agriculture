@@ -39,7 +39,7 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Employee",
   "pagination": "pagination",
   "readOnly": false,

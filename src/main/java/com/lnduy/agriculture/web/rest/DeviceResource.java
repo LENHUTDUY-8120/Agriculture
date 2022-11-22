@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.DeviceRepository;
+import com.lnduy.agriculture.service.DeviceQueryService;
 import com.lnduy.agriculture.service.DeviceService;
+import com.lnduy.agriculture.service.criteria.DeviceCriteria;
 import com.lnduy.agriculture.service.dto.DeviceDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -35,9 +37,12 @@ public class DeviceResource {
 
     private final DeviceRepository deviceRepository;
 
-    public DeviceResource(DeviceService deviceService, DeviceRepository deviceRepository) {
+    private final DeviceQueryService deviceQueryService;
+
+    public DeviceResource(DeviceService deviceService, DeviceRepository deviceRepository, DeviceQueryService deviceQueryService) {
         this.deviceService = deviceService;
         this.deviceRepository = deviceRepository;
+        this.deviceQueryService = deviceQueryService;
     }
 
     /**
@@ -133,12 +138,26 @@ public class DeviceResource {
     /**
      * {@code GET  /devices} : get all the devices.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of devices in body.
      */
     @GetMapping("/devices")
-    public List<DeviceDTO> getAllDevices() {
-        log.debug("REST request to get all Devices");
-        return deviceService.findAll();
+    public ResponseEntity<List<DeviceDTO>> getAllDevices(DeviceCriteria criteria) {
+        log.debug("REST request to get Devices by criteria: {}", criteria);
+        List<DeviceDTO> entityList = deviceQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /devices/count} : count all the devices.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/devices/count")
+    public ResponseEntity<Long> countDevices(DeviceCriteria criteria) {
+        log.debug("REST request to count Devices by criteria: {}", criteria);
+        return ResponseEntity.ok().body(deviceQueryService.countByCriteria(criteria));
     }
 
     /**

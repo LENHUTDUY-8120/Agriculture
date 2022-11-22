@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.TaskRepository;
+import com.lnduy.agriculture.service.TaskQueryService;
 import com.lnduy.agriculture.service.TaskService;
+import com.lnduy.agriculture.service.criteria.TaskCriteria;
 import com.lnduy.agriculture.service.dto.TaskDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,9 +42,12 @@ public class TaskResource {
 
     private final TaskRepository taskRepository;
 
-    public TaskResource(TaskService taskService, TaskRepository taskRepository) {
+    private final TaskQueryService taskQueryService;
+
+    public TaskResource(TaskService taskService, TaskRepository taskRepository, TaskQueryService taskQueryService) {
         this.taskService = taskService;
         this.taskRepository = taskRepository;
+        this.taskQueryService = taskQueryService;
     }
 
     /**
@@ -138,23 +142,30 @@ public class TaskResource {
      * {@code GET  /tasks} : get all the tasks.
      *
      * @param pageable the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tasks in body.
      */
     @GetMapping("/tasks")
     public ResponseEntity<List<TaskDTO>> getAllTasks(
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable,
-        @RequestParam(required = false, defaultValue = "false") boolean eagerload
+        TaskCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of Tasks");
-        Page<TaskDTO> page;
-        if (eagerload) {
-            page = taskService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = taskService.findAll(pageable);
-        }
+        log.debug("REST request to get Tasks by criteria: {}", criteria);
+        Page<TaskDTO> page = taskQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /tasks/count} : count all the tasks.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/tasks/count")
+    public ResponseEntity<Long> countTasks(TaskCriteria criteria) {
+        log.debug("REST request to count Tasks by criteria: {}", criteria);
+        return ResponseEntity.ok().body(taskQueryService.countByCriteria(criteria));
     }
 
     /**

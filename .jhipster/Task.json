@@ -14,6 +14,10 @@
       "fieldType": "String"
     },
     {
+      "fieldName": "enable",
+      "fieldType": "Integer"
+    },
+    {
       "fieldName": "startDate",
       "fieldType": "ZonedDateTime"
     },
@@ -24,7 +28,7 @@
   ],
   "fluentMethods": true,
   "javadoc": "Task entity.\\n@author The JHipster team.",
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Task",
   "pagination": "pagination",
   "readOnly": false,

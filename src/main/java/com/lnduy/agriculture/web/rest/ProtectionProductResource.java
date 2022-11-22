@@ -1,7 +1,9 @@
 package com.lnduy.agriculture.web.rest;
 
 import com.lnduy.agriculture.repository.ProtectionProductRepository;
+import com.lnduy.agriculture.service.ProtectionProductQueryService;
 import com.lnduy.agriculture.service.ProtectionProductService;
+import com.lnduy.agriculture.service.criteria.ProtectionProductCriteria;
 import com.lnduy.agriculture.service.dto.ProtectionProductDTO;
 import com.lnduy.agriculture.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,12 +42,16 @@ public class ProtectionProductResource {
 
     private final ProtectionProductRepository protectionProductRepository;
 
+    private final ProtectionProductQueryService protectionProductQueryService;
+
     public ProtectionProductResource(
         ProtectionProductService protectionProductService,
-        ProtectionProductRepository protectionProductRepository
+        ProtectionProductRepository protectionProductRepository,
+        ProtectionProductQueryService protectionProductQueryService
     ) {
         this.protectionProductService = protectionProductService;
         this.protectionProductRepository = protectionProductRepository;
+        this.protectionProductQueryService = protectionProductQueryService;
     }
 
     /**
@@ -144,16 +149,30 @@ public class ProtectionProductResource {
      * {@code GET  /protection-products} : get all the protectionProducts.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of protectionProducts in body.
      */
     @GetMapping("/protection-products")
     public ResponseEntity<List<ProtectionProductDTO>> getAllProtectionProducts(
+        ProtectionProductCriteria criteria,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of ProtectionProducts");
-        Page<ProtectionProductDTO> page = protectionProductService.findAll(pageable);
+        log.debug("REST request to get ProtectionProducts by criteria: {}", criteria);
+        Page<ProtectionProductDTO> page = protectionProductQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /protection-products/count} : count all the protectionProducts.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/protection-products/count")
+    public ResponseEntity<Long> countProtectionProducts(ProtectionProductCriteria criteria) {
+        log.debug("REST request to count ProtectionProducts by criteria: {}", criteria);
+        return ResponseEntity.ok().body(protectionProductQueryService.countByCriteria(criteria));
     }
 
     /**
