@@ -35,6 +35,9 @@ public class Season implements Serializable {
     @Column(name = "enable")
     private Integer enable;
 
+    @Column(name = "volume")
+    private float volume;
+
     @Column(name = "unit")
     private String unit;
 
@@ -132,6 +135,19 @@ public class Season implements Serializable {
 
     public Season unit(String unit) {
         this.setUnit(unit);
+        return this;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public void setVolume(float volume) {
+        this.volume = volume;
+    }
+
+    public Season unit(float volume) {
+        this.setVolume(volume);
         return this;
     }
 

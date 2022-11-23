@@ -20,6 +20,8 @@ public class SeasonDTO implements Serializable {
 
     private Integer enable;
 
+    private float volume;
+
     private String unit;
 
     private Integer done;
@@ -70,6 +72,14 @@ public class SeasonDTO implements Serializable {
 
     public void setEnable(Integer enable) {
         this.enable = enable;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public void setVolume(float volume) {
+        this.volume = volume;
     }
 
     public String getUnit() {
