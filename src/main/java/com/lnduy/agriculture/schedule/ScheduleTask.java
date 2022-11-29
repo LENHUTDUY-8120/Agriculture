@@ -74,6 +74,7 @@ public class ScheduleTask {
                     eventDTO.setContent((String) map.get("content"));
                     eventDTO.setStartAt(LocalDate.parse((CharSequence) map.get("date")));
                     eventDTO.setDescriptions((String) map.get("time"));
+                    eventDTO.setTitle("Control");
                     eventService.save(eventDTO);
                 }
             });
