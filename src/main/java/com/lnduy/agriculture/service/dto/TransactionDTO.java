@@ -2,7 +2,7 @@ package com.lnduy.agriculture.service.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -21,7 +21,7 @@ public class TransactionDTO implements Serializable {
 
     private String descriptions;
 
-    private ZonedDateTime createdAt;
+    private LocalDate createdAt;
 
     private SeasonDTO season;
 
@@ -65,11 +65,11 @@ public class TransactionDTO implements Serializable {
         this.descriptions = descriptions;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 

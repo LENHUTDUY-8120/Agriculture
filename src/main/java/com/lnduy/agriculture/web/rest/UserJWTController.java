@@ -3,6 +3,7 @@ package com.lnduy.agriculture.web.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lnduy.agriculture.security.jwt.JWTFilter;
 import com.lnduy.agriculture.security.jwt.TokenProvider;
+import com.lnduy.agriculture.service.MailService;
 import com.lnduy.agriculture.web.rest.vm.LoginVM;
 import javax.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -23,11 +24,14 @@ public class UserJWTController {
 
     private final TokenProvider tokenProvider;
 
+    private final MailService mailService;
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, MailService mailService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.mailService = mailService;
     }
 
     @PostMapping("/authenticate")
@@ -42,7 +46,7 @@ public class UserJWTController {
         String jwt = tokenProvider.createToken(authentication, loginVM.isRememberMe());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken(jwt, loginVM.getUsername()), httpHeaders, HttpStatus.OK);
     }
 
     /**
@@ -51,9 +55,11 @@ public class UserJWTController {
     static class JWTToken {
 
         private String idToken;
+        private String username;
 
-        JWTToken(String idToken) {
+        JWTToken(String idToken, String username) {
             this.idToken = idToken;
+            this.username = username;
         }
 
         @JsonProperty("id_token")
@@ -63,6 +69,14 @@ public class UserJWTController {
 
         void setIdToken(String idToken) {
             this.idToken = idToken;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
         }
     }
 }

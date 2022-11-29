@@ -29,9 +29,9 @@ public class TaskCriteria implements Serializable, Criteria {
 
     private IntegerFilter enable;
 
-    private ZonedDateTimeFilter startDate;
+    private LocalDateFilter startDate;
 
-    private ZonedDateTimeFilter endDate;
+    private LocalDateFilter endDate;
 
     private LongFilter seasonId;
 
@@ -127,33 +127,33 @@ public class TaskCriteria implements Serializable, Criteria {
         this.enable = enable;
     }
 
-    public ZonedDateTimeFilter getStartDate() {
+    public LocalDateFilter getStartDate() {
         return startDate;
     }
 
-    public ZonedDateTimeFilter startDate() {
+    public LocalDateFilter startDate() {
         if (startDate == null) {
-            startDate = new ZonedDateTimeFilter();
+            startDate = new LocalDateFilter();
         }
         return startDate;
     }
 
-    public void setStartDate(ZonedDateTimeFilter startDate) {
+    public void setStartDate(LocalDateFilter startDate) {
         this.startDate = startDate;
     }
 
-    public ZonedDateTimeFilter getEndDate() {
+    public LocalDateFilter getEndDate() {
         return endDate;
     }
 
-    public ZonedDateTimeFilter endDate() {
+    public LocalDateFilter endDate() {
         if (endDate == null) {
-            endDate = new ZonedDateTimeFilter();
+            endDate = new LocalDateFilter();
         }
         return endDate;
     }
 
-    public void setEndDate(ZonedDateTimeFilter endDate) {
+    public void setEndDate(LocalDateFilter endDate) {
         this.endDate = endDate;
     }
 

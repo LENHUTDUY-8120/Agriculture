@@ -1,6 +1,5 @@
 package com.lnduy.agriculture.web.rest;
 
-import static com.lnduy.agriculture.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -13,10 +12,8 @@ import com.lnduy.agriculture.repository.EventRepository;
 import com.lnduy.agriculture.service.criteria.EventCriteria;
 import com.lnduy.agriculture.service.dto.EventDTO;
 import com.lnduy.agriculture.service.mapper.EventMapper;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,14 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class EventResourceIT {
 
-    private static final ZonedDateTime DEFAULT_START_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_START_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_START_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
-
-    private static final ZonedDateTime DEFAULT_END_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_END_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_END_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
-
     private static final String DEFAULT_TITLE = "AAAAAAAAAA";
     private static final String UPDATED_TITLE = "BBBBBBBBBB";
 
@@ -55,13 +44,13 @@ class EventResourceIT {
     private static final String DEFAULT_CONTENT = "AAAAAAAAAA";
     private static final String UPDATED_CONTENT = "BBBBBBBBBB";
 
-    private static final ZonedDateTime DEFAULT_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_START_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final LocalDate DEFAULT_START_AT = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_START_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_START_AT = LocalDate.ofEpochDay(-1L);
 
-    private static final ZonedDateTime DEFAULT_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_END_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final LocalDate DEFAULT_END_AT = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_END_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_END_AT = LocalDate.ofEpochDay(-1L);
 
     private static final String ENTITY_API_URL = "/api/events";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -91,8 +80,6 @@ class EventResourceIT {
      */
     public static Event createEntity(EntityManager em) {
         Event event = new Event()
-            .startDate(DEFAULT_START_DATE)
-            .endDate(DEFAULT_END_DATE)
             .title(DEFAULT_TITLE)
             .descriptions(DEFAULT_DESCRIPTIONS)
             .content(DEFAULT_CONTENT)
@@ -109,8 +96,6 @@ class EventResourceIT {
      */
     public static Event createUpdatedEntity(EntityManager em) {
         Event event = new Event()
-            .startDate(UPDATED_START_DATE)
-            .endDate(UPDATED_END_DATE)
             .title(UPDATED_TITLE)
             .descriptions(UPDATED_DESCRIPTIONS)
             .content(UPDATED_CONTENT)
@@ -138,8 +123,6 @@ class EventResourceIT {
         List<Event> eventList = eventRepository.findAll();
         assertThat(eventList).hasSize(databaseSizeBeforeCreate + 1);
         Event testEvent = eventList.get(eventList.size() - 1);
-        assertThat(testEvent.getStartDate()).isEqualTo(DEFAULT_START_DATE);
-        assertThat(testEvent.getEndDate()).isEqualTo(DEFAULT_END_DATE);
         assertThat(testEvent.getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(testEvent.getDescriptions()).isEqualTo(DEFAULT_DESCRIPTIONS);
         assertThat(testEvent.getContent()).isEqualTo(DEFAULT_CONTENT);
@@ -178,13 +161,11 @@ class EventResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(event.getId().intValue())))
-            .andExpect(jsonPath("$.[*].startDate").value(hasItem(sameInstant(DEFAULT_START_DATE))))
-            .andExpect(jsonPath("$.[*].endDate").value(hasItem(sameInstant(DEFAULT_END_DATE))))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].descriptions").value(hasItem(DEFAULT_DESCRIPTIONS)))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
-            .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
-            .andExpect(jsonPath("$.[*].endAt").value(hasItem(sameInstant(DEFAULT_END_AT))));
+            .andExpect(jsonPath("$.[*].startAt").value(hasItem(DEFAULT_START_AT.toString())))
+            .andExpect(jsonPath("$.[*].endAt").value(hasItem(DEFAULT_END_AT.toString())));
     }
 
     @Test
@@ -199,13 +180,11 @@ class EventResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(event.getId().intValue()))
-            .andExpect(jsonPath("$.startDate").value(sameInstant(DEFAULT_START_DATE)))
-            .andExpect(jsonPath("$.endDate").value(sameInstant(DEFAULT_END_DATE)))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
             .andExpect(jsonPath("$.descriptions").value(DEFAULT_DESCRIPTIONS))
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT))
-            .andExpect(jsonPath("$.startAt").value(sameInstant(DEFAULT_START_AT)))
-            .andExpect(jsonPath("$.endAt").value(sameInstant(DEFAULT_END_AT)));
+            .andExpect(jsonPath("$.startAt").value(DEFAULT_START_AT.toString()))
+            .andExpect(jsonPath("$.endAt").value(DEFAULT_END_AT.toString()));
     }
 
     @Test
@@ -224,188 +203,6 @@ class EventResourceIT {
 
         defaultEventShouldBeFound("id.lessThanOrEqual=" + id);
         defaultEventShouldNotBeFound("id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate equals to DEFAULT_START_DATE
-        defaultEventShouldBeFound("startDate.equals=" + DEFAULT_START_DATE);
-
-        // Get all the eventList where startDate equals to UPDATED_START_DATE
-        defaultEventShouldNotBeFound("startDate.equals=" + UPDATED_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsInShouldWork() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate in DEFAULT_START_DATE or UPDATED_START_DATE
-        defaultEventShouldBeFound("startDate.in=" + DEFAULT_START_DATE + "," + UPDATED_START_DATE);
-
-        // Get all the eventList where startDate equals to UPDATED_START_DATE
-        defaultEventShouldNotBeFound("startDate.in=" + UPDATED_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate is not null
-        defaultEventShouldBeFound("startDate.specified=true");
-
-        // Get all the eventList where startDate is null
-        defaultEventShouldNotBeFound("startDate.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate is greater than or equal to DEFAULT_START_DATE
-        defaultEventShouldBeFound("startDate.greaterThanOrEqual=" + DEFAULT_START_DATE);
-
-        // Get all the eventList where startDate is greater than or equal to UPDATED_START_DATE
-        defaultEventShouldNotBeFound("startDate.greaterThanOrEqual=" + UPDATED_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate is less than or equal to DEFAULT_START_DATE
-        defaultEventShouldBeFound("startDate.lessThanOrEqual=" + DEFAULT_START_DATE);
-
-        // Get all the eventList where startDate is less than or equal to SMALLER_START_DATE
-        defaultEventShouldNotBeFound("startDate.lessThanOrEqual=" + SMALLER_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate is less than DEFAULT_START_DATE
-        defaultEventShouldNotBeFound("startDate.lessThan=" + DEFAULT_START_DATE);
-
-        // Get all the eventList where startDate is less than UPDATED_START_DATE
-        defaultEventShouldBeFound("startDate.lessThan=" + UPDATED_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByStartDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where startDate is greater than DEFAULT_START_DATE
-        defaultEventShouldNotBeFound("startDate.greaterThan=" + DEFAULT_START_DATE);
-
-        // Get all the eventList where startDate is greater than SMALLER_START_DATE
-        defaultEventShouldBeFound("startDate.greaterThan=" + SMALLER_START_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate equals to DEFAULT_END_DATE
-        defaultEventShouldBeFound("endDate.equals=" + DEFAULT_END_DATE);
-
-        // Get all the eventList where endDate equals to UPDATED_END_DATE
-        defaultEventShouldNotBeFound("endDate.equals=" + UPDATED_END_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsInShouldWork() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate in DEFAULT_END_DATE or UPDATED_END_DATE
-        defaultEventShouldBeFound("endDate.in=" + DEFAULT_END_DATE + "," + UPDATED_END_DATE);
-
-        // Get all the eventList where endDate equals to UPDATED_END_DATE
-        defaultEventShouldNotBeFound("endDate.in=" + UPDATED_END_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate is not null
-        defaultEventShouldBeFound("endDate.specified=true");
-
-        // Get all the eventList where endDate is null
-        defaultEventShouldNotBeFound("endDate.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate is greater than or equal to DEFAULT_END_DATE
-        defaultEventShouldBeFound("endDate.greaterThanOrEqual=" + DEFAULT_END_DATE);
-
-        // Get all the eventList where endDate is greater than or equal to UPDATED_END_DATE
-        defaultEventShouldNotBeFound("endDate.greaterThanOrEqual=" + UPDATED_END_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate is less than or equal to DEFAULT_END_DATE
-        defaultEventShouldBeFound("endDate.lessThanOrEqual=" + DEFAULT_END_DATE);
-
-        // Get all the eventList where endDate is less than or equal to SMALLER_END_DATE
-        defaultEventShouldNotBeFound("endDate.lessThanOrEqual=" + SMALLER_END_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate is less than DEFAULT_END_DATE
-        defaultEventShouldNotBeFound("endDate.lessThan=" + DEFAULT_END_DATE);
-
-        // Get all the eventList where endDate is less than UPDATED_END_DATE
-        defaultEventShouldBeFound("endDate.lessThan=" + UPDATED_END_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllEventsByEndDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        eventRepository.saveAndFlush(event);
-
-        // Get all the eventList where endDate is greater than DEFAULT_END_DATE
-        defaultEventShouldNotBeFound("endDate.greaterThan=" + DEFAULT_END_DATE);
-
-        // Get all the eventList where endDate is greater than SMALLER_END_DATE
-        defaultEventShouldBeFound("endDate.greaterThan=" + SMALLER_END_DATE);
     }
 
     @Test
@@ -817,13 +614,11 @@ class EventResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(event.getId().intValue())))
-            .andExpect(jsonPath("$.[*].startDate").value(hasItem(sameInstant(DEFAULT_START_DATE))))
-            .andExpect(jsonPath("$.[*].endDate").value(hasItem(sameInstant(DEFAULT_END_DATE))))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].descriptions").value(hasItem(DEFAULT_DESCRIPTIONS)))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
-            .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
-            .andExpect(jsonPath("$.[*].endAt").value(hasItem(sameInstant(DEFAULT_END_AT))));
+            .andExpect(jsonPath("$.[*].startAt").value(hasItem(DEFAULT_START_AT.toString())))
+            .andExpect(jsonPath("$.[*].endAt").value(hasItem(DEFAULT_END_AT.toString())));
 
         // Check, that the count call also returns 1
         restEventMockMvc
@@ -872,8 +667,6 @@ class EventResourceIT {
         // Disconnect from session so that the updates on updatedEvent are not directly saved in db
         em.detach(updatedEvent);
         updatedEvent
-            .startDate(UPDATED_START_DATE)
-            .endDate(UPDATED_END_DATE)
             .title(UPDATED_TITLE)
             .descriptions(UPDATED_DESCRIPTIONS)
             .content(UPDATED_CONTENT)
@@ -893,8 +686,6 @@ class EventResourceIT {
         List<Event> eventList = eventRepository.findAll();
         assertThat(eventList).hasSize(databaseSizeBeforeUpdate);
         Event testEvent = eventList.get(eventList.size() - 1);
-        assertThat(testEvent.getStartDate()).isEqualTo(UPDATED_START_DATE);
-        assertThat(testEvent.getEndDate()).isEqualTo(UPDATED_END_DATE);
         assertThat(testEvent.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testEvent.getDescriptions()).isEqualTo(UPDATED_DESCRIPTIONS);
         assertThat(testEvent.getContent()).isEqualTo(UPDATED_CONTENT);
@@ -979,7 +770,7 @@ class EventResourceIT {
         Event partialUpdatedEvent = new Event();
         partialUpdatedEvent.setId(event.getId());
 
-        partialUpdatedEvent.endDate(UPDATED_END_DATE);
+        partialUpdatedEvent.descriptions(UPDATED_DESCRIPTIONS);
 
         restEventMockMvc
             .perform(
@@ -993,10 +784,8 @@ class EventResourceIT {
         List<Event> eventList = eventRepository.findAll();
         assertThat(eventList).hasSize(databaseSizeBeforeUpdate);
         Event testEvent = eventList.get(eventList.size() - 1);
-        assertThat(testEvent.getStartDate()).isEqualTo(DEFAULT_START_DATE);
-        assertThat(testEvent.getEndDate()).isEqualTo(UPDATED_END_DATE);
         assertThat(testEvent.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testEvent.getDescriptions()).isEqualTo(DEFAULT_DESCRIPTIONS);
+        assertThat(testEvent.getDescriptions()).isEqualTo(UPDATED_DESCRIPTIONS);
         assertThat(testEvent.getContent()).isEqualTo(DEFAULT_CONTENT);
         assertThat(testEvent.getStartAt()).isEqualTo(DEFAULT_START_AT);
         assertThat(testEvent.getEndAt()).isEqualTo(DEFAULT_END_AT);
@@ -1015,8 +804,6 @@ class EventResourceIT {
         partialUpdatedEvent.setId(event.getId());
 
         partialUpdatedEvent
-            .startDate(UPDATED_START_DATE)
-            .endDate(UPDATED_END_DATE)
             .title(UPDATED_TITLE)
             .descriptions(UPDATED_DESCRIPTIONS)
             .content(UPDATED_CONTENT)
@@ -1035,8 +822,6 @@ class EventResourceIT {
         List<Event> eventList = eventRepository.findAll();
         assertThat(eventList).hasSize(databaseSizeBeforeUpdate);
         Event testEvent = eventList.get(eventList.size() - 1);
-        assertThat(testEvent.getStartDate()).isEqualTo(UPDATED_START_DATE);
-        assertThat(testEvent.getEndDate()).isEqualTo(UPDATED_END_DATE);
         assertThat(testEvent.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testEvent.getDescriptions()).isEqualTo(UPDATED_DESCRIPTIONS);
         assertThat(testEvent.getContent()).isEqualTo(UPDATED_CONTENT);

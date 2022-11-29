@@ -102,6 +102,9 @@ public class SeasonQueryService extends QueryService<Season> {
             if (criteria.getEnable() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getEnable(), Season_.enable));
             }
+            if (criteria.getVolume() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getVolume(), Season_.volume));
+            }
             if (criteria.getUnit() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getUnit(), Season_.unit));
             }

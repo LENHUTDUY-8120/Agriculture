@@ -1,6 +1,5 @@
 package com.lnduy.agriculture.web.rest;
 
-import static com.lnduy.agriculture.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,10 +14,8 @@ import com.lnduy.agriculture.repository.SeasonRepository;
 import com.lnduy.agriculture.service.criteria.SeasonCriteria;
 import com.lnduy.agriculture.service.dto.SeasonDTO;
 import com.lnduy.agriculture.service.mapper.SeasonMapper;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,6 +52,10 @@ class SeasonResourceIT {
     private static final Integer UPDATED_ENABLE = 2;
     private static final Integer SMALLER_ENABLE = 1 - 1;
 
+    private static final Float DEFAULT_VOLUME = 1F;
+    private static final Float UPDATED_VOLUME = 2F;
+    private static final Float SMALLER_VOLUME = 1F - 1F;
+
     private static final String DEFAULT_UNIT = "AAAAAAAAAA";
     private static final String UPDATED_UNIT = "BBBBBBBBBB";
 
@@ -62,13 +63,13 @@ class SeasonResourceIT {
     private static final Integer UPDATED_DONE = 2;
     private static final Integer SMALLER_DONE = 1 - 1;
 
-    private static final ZonedDateTime DEFAULT_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_START_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_START_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final LocalDate DEFAULT_START_AT = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_START_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_START_AT = LocalDate.ofEpochDay(-1L);
 
-    private static final ZonedDateTime DEFAULT_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_END_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_END_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final LocalDate DEFAULT_END_AT = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_END_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_END_AT = LocalDate.ofEpochDay(-1L);
 
     private static final String ENTITY_API_URL = "/api/seasons";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -102,6 +103,7 @@ class SeasonResourceIT {
             .totalCost(DEFAULT_TOTAL_COST)
             .cropYields(DEFAULT_CROP_YIELDS)
             .enable(DEFAULT_ENABLE)
+            .volume(DEFAULT_VOLUME)
             .unit(DEFAULT_UNIT)
             .done(DEFAULT_DONE)
             .startAt(DEFAULT_START_AT)
@@ -121,6 +123,7 @@ class SeasonResourceIT {
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
             .enable(UPDATED_ENABLE)
+            .volume(UPDATED_VOLUME)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -151,6 +154,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getTotalCost()).isEqualTo(DEFAULT_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(DEFAULT_CROP_YIELDS);
         assertThat(testSeason.getEnable()).isEqualTo(DEFAULT_ENABLE);
+        assertThat(testSeason.getVolume()).isEqualTo(DEFAULT_VOLUME);
         assertThat(testSeason.getUnit()).isEqualTo(DEFAULT_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(DEFAULT_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(DEFAULT_START_AT);
@@ -192,10 +196,11 @@ class SeasonResourceIT {
             .andExpect(jsonPath("$.[*].totalCost").value(hasItem(DEFAULT_TOTAL_COST.doubleValue())))
             .andExpect(jsonPath("$.[*].cropYields").value(hasItem(DEFAULT_CROP_YIELDS.doubleValue())))
             .andExpect(jsonPath("$.[*].enable").value(hasItem(DEFAULT_ENABLE)))
+            .andExpect(jsonPath("$.[*].volume").value(hasItem(DEFAULT_VOLUME.doubleValue())))
             .andExpect(jsonPath("$.[*].unit").value(hasItem(DEFAULT_UNIT)))
             .andExpect(jsonPath("$.[*].done").value(hasItem(DEFAULT_DONE)))
-            .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
-            .andExpect(jsonPath("$.[*].endAt").value(hasItem(sameInstant(DEFAULT_END_AT))));
+            .andExpect(jsonPath("$.[*].startAt").value(hasItem(DEFAULT_START_AT.toString())))
+            .andExpect(jsonPath("$.[*].endAt").value(hasItem(DEFAULT_END_AT.toString())));
     }
 
     @Test
@@ -214,10 +219,11 @@ class SeasonResourceIT {
             .andExpect(jsonPath("$.totalCost").value(DEFAULT_TOTAL_COST.doubleValue()))
             .andExpect(jsonPath("$.cropYields").value(DEFAULT_CROP_YIELDS.doubleValue()))
             .andExpect(jsonPath("$.enable").value(DEFAULT_ENABLE))
+            .andExpect(jsonPath("$.volume").value(DEFAULT_VOLUME.doubleValue()))
             .andExpect(jsonPath("$.unit").value(DEFAULT_UNIT))
             .andExpect(jsonPath("$.done").value(DEFAULT_DONE))
-            .andExpect(jsonPath("$.startAt").value(sameInstant(DEFAULT_START_AT)))
-            .andExpect(jsonPath("$.endAt").value(sameInstant(DEFAULT_END_AT)));
+            .andExpect(jsonPath("$.startAt").value(DEFAULT_START_AT.toString()))
+            .andExpect(jsonPath("$.endAt").value(DEFAULT_END_AT.toString()));
     }
 
     @Test
@@ -574,6 +580,97 @@ class SeasonResourceIT {
 
         // Get all the seasonList where enable is greater than SMALLER_ENABLE
         defaultSeasonShouldBeFound("enable.greaterThan=" + SMALLER_ENABLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume equals to DEFAULT_VOLUME
+        defaultSeasonShouldBeFound("volume.equals=" + DEFAULT_VOLUME);
+
+        // Get all the seasonList where volume equals to UPDATED_VOLUME
+        defaultSeasonShouldNotBeFound("volume.equals=" + UPDATED_VOLUME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsInShouldWork() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume in DEFAULT_VOLUME or UPDATED_VOLUME
+        defaultSeasonShouldBeFound("volume.in=" + DEFAULT_VOLUME + "," + UPDATED_VOLUME);
+
+        // Get all the seasonList where volume equals to UPDATED_VOLUME
+        defaultSeasonShouldNotBeFound("volume.in=" + UPDATED_VOLUME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume is not null
+        defaultSeasonShouldBeFound("volume.specified=true");
+
+        // Get all the seasonList where volume is null
+        defaultSeasonShouldNotBeFound("volume.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume is greater than or equal to DEFAULT_VOLUME
+        defaultSeasonShouldBeFound("volume.greaterThanOrEqual=" + DEFAULT_VOLUME);
+
+        // Get all the seasonList where volume is greater than or equal to UPDATED_VOLUME
+        defaultSeasonShouldNotBeFound("volume.greaterThanOrEqual=" + UPDATED_VOLUME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume is less than or equal to DEFAULT_VOLUME
+        defaultSeasonShouldBeFound("volume.lessThanOrEqual=" + DEFAULT_VOLUME);
+
+        // Get all the seasonList where volume is less than or equal to SMALLER_VOLUME
+        defaultSeasonShouldNotBeFound("volume.lessThanOrEqual=" + SMALLER_VOLUME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsLessThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume is less than DEFAULT_VOLUME
+        defaultSeasonShouldNotBeFound("volume.lessThan=" + DEFAULT_VOLUME);
+
+        // Get all the seasonList where volume is less than UPDATED_VOLUME
+        defaultSeasonShouldBeFound("volume.lessThan=" + UPDATED_VOLUME);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeasonsByVolumeIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        seasonRepository.saveAndFlush(season);
+
+        // Get all the seasonList where volume is greater than DEFAULT_VOLUME
+        defaultSeasonShouldNotBeFound("volume.greaterThan=" + DEFAULT_VOLUME);
+
+        // Get all the seasonList where volume is greater than SMALLER_VOLUME
+        defaultSeasonShouldBeFound("volume.greaterThan=" + SMALLER_VOLUME);
     }
 
     @Test
@@ -996,10 +1093,11 @@ class SeasonResourceIT {
             .andExpect(jsonPath("$.[*].totalCost").value(hasItem(DEFAULT_TOTAL_COST.doubleValue())))
             .andExpect(jsonPath("$.[*].cropYields").value(hasItem(DEFAULT_CROP_YIELDS.doubleValue())))
             .andExpect(jsonPath("$.[*].enable").value(hasItem(DEFAULT_ENABLE)))
+            .andExpect(jsonPath("$.[*].volume").value(hasItem(DEFAULT_VOLUME.doubleValue())))
             .andExpect(jsonPath("$.[*].unit").value(hasItem(DEFAULT_UNIT)))
             .andExpect(jsonPath("$.[*].done").value(hasItem(DEFAULT_DONE)))
-            .andExpect(jsonPath("$.[*].startAt").value(hasItem(sameInstant(DEFAULT_START_AT))))
-            .andExpect(jsonPath("$.[*].endAt").value(hasItem(sameInstant(DEFAULT_END_AT))));
+            .andExpect(jsonPath("$.[*].startAt").value(hasItem(DEFAULT_START_AT.toString())))
+            .andExpect(jsonPath("$.[*].endAt").value(hasItem(DEFAULT_END_AT.toString())));
 
         // Check, that the count call also returns 1
         restSeasonMockMvc
@@ -1052,6 +1150,7 @@ class SeasonResourceIT {
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
             .enable(UPDATED_ENABLE)
+            .volume(UPDATED_VOLUME)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -1074,6 +1173,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(UPDATED_CROP_YIELDS);
         assertThat(testSeason.getEnable()).isEqualTo(UPDATED_ENABLE);
+        assertThat(testSeason.getVolume()).isEqualTo(UPDATED_VOLUME);
         assertThat(testSeason.getUnit()).isEqualTo(UPDATED_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(UPDATED_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);
@@ -1157,7 +1257,7 @@ class SeasonResourceIT {
         Season partialUpdatedSeason = new Season();
         partialUpdatedSeason.setId(season.getId());
 
-        partialUpdatedSeason.totalCost(UPDATED_TOTAL_COST).startAt(UPDATED_START_AT).endAt(UPDATED_END_AT);
+        partialUpdatedSeason.totalCost(UPDATED_TOTAL_COST).done(UPDATED_DONE).startAt(UPDATED_START_AT).endAt(UPDATED_END_AT);
 
         restSeasonMockMvc
             .perform(
@@ -1175,8 +1275,9 @@ class SeasonResourceIT {
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(DEFAULT_CROP_YIELDS);
         assertThat(testSeason.getEnable()).isEqualTo(DEFAULT_ENABLE);
+        assertThat(testSeason.getVolume()).isEqualTo(DEFAULT_VOLUME);
         assertThat(testSeason.getUnit()).isEqualTo(DEFAULT_UNIT);
-        assertThat(testSeason.getDone()).isEqualTo(DEFAULT_DONE);
+        assertThat(testSeason.getDone()).isEqualTo(UPDATED_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);
         assertThat(testSeason.getEndAt()).isEqualTo(UPDATED_END_AT);
     }
@@ -1198,6 +1299,7 @@ class SeasonResourceIT {
             .totalCost(UPDATED_TOTAL_COST)
             .cropYields(UPDATED_CROP_YIELDS)
             .enable(UPDATED_ENABLE)
+            .volume(UPDATED_VOLUME)
             .unit(UPDATED_UNIT)
             .done(UPDATED_DONE)
             .startAt(UPDATED_START_AT)
@@ -1219,6 +1321,7 @@ class SeasonResourceIT {
         assertThat(testSeason.getTotalCost()).isEqualTo(UPDATED_TOTAL_COST);
         assertThat(testSeason.getCropYields()).isEqualTo(UPDATED_CROP_YIELDS);
         assertThat(testSeason.getEnable()).isEqualTo(UPDATED_ENABLE);
+        assertThat(testSeason.getVolume()).isEqualTo(UPDATED_VOLUME);
         assertThat(testSeason.getUnit()).isEqualTo(UPDATED_UNIT);
         assertThat(testSeason.getDone()).isEqualTo(UPDATED_DONE);
         assertThat(testSeason.getStartAt()).isEqualTo(UPDATED_START_AT);

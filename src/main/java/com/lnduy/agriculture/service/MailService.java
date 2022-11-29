@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import com.lnduy.agriculture.service.dto.TaskDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -90,6 +92,21 @@ public class MailService {
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
+    }
+
+    @Async
+    public void sendEmailTask(String email, TaskDTO task) {
+        Locale locale = Locale.forLanguageTag("en");
+        Context context = new Context(locale);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable("task", task);
+        context.setVariable("employees", task.getEmployees());
+        context.setVariable("supplies", task.getSupplies());
+        context.setVariable("Fertilizers", task.getFertilizers());
+        context.setVariable("protectionProducts", task.getProtectionproducts());
+        String content = templateEngine.process("mail/taskRemind", context);
+        String subject = "Task Reminder";
+        sendEmail(email, subject, content, false, true);
     }
 
     @Async

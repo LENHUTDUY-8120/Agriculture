@@ -1,7 +1,7 @@
 package com.lnduy.agriculture.service.dto;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -20,15 +20,15 @@ public class SeasonDTO implements Serializable {
 
     private Integer enable;
 
-    private float volume;
+    private Float volume;
 
     private String unit;
 
     private Integer done;
 
-    private ZonedDateTime startAt;
+    private LocalDate startAt;
 
-    private ZonedDateTime endAt;
+    private LocalDate endAt;
 
     private CropsDTO crop;
 
@@ -74,11 +74,11 @@ public class SeasonDTO implements Serializable {
         this.enable = enable;
     }
 
-    public float getVolume() {
+    public Float getVolume() {
         return volume;
     }
 
-    public void setVolume(float volume) {
+    public void setVolume(Float volume) {
         this.volume = volume;
     }
 
@@ -98,19 +98,19 @@ public class SeasonDTO implements Serializable {
         this.done = done;
     }
 
-    public ZonedDateTime getStartAt() {
+    public LocalDate getStartAt() {
         return startAt;
     }
 
-    public void setStartAt(ZonedDateTime startAt) {
+    public void setStartAt(LocalDate startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTime getEndAt() {
+    public LocalDate getEndAt() {
         return endAt;
     }
 
-    public void setEndAt(ZonedDateTime endAt) {
+    public void setEndAt(LocalDate endAt) {
         this.endAt = endAt;
     }
 
@@ -160,6 +160,7 @@ public class SeasonDTO implements Serializable {
             ", totalCost=" + getTotalCost() +
             ", cropYields=" + getCropYields() +
             ", enable=" + getEnable() +
+            ", volume=" + getVolume() +
             ", unit='" + getUnit() + "'" +
             ", done=" + getDone() +
             ", startAt='" + getStartAt() + "'" +

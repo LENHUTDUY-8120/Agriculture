@@ -2,7 +2,7 @@ package com.lnduy.agriculture.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import javax.persistence.*;
 
 /**
@@ -21,11 +21,11 @@ public class Monitoring implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "data_json")
-    private String dataJson;
+    @Column(name = "value")
+    private Double value;
 
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private LocalDate createdAt;
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "seasons", "devices", "soil" }, allowSetters = true)
@@ -50,29 +50,30 @@ public class Monitoring implements Serializable {
         this.id = id;
     }
 
-    public String getDataJson() {
-        return this.dataJson;
-    }
 
-    public Monitoring dataJson(String dataJson) {
-        this.setDataJson(dataJson);
+    public Monitoring value(Double value) {
+        this.setValue(value);
         return this;
     }
 
-    public void setDataJson(String dataJson) {
-        this.dataJson = dataJson;
+    public Double getValue() {
+        return value;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public void setValue(Double value) {
+        this.value = value;
+    }
+
+    public LocalDate getCreatedAt() {
         return this.createdAt;
     }
 
-    public Monitoring createdAt(ZonedDateTime createdAt) {
+    public Monitoring createdAt(LocalDate createdAt) {
         this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -126,7 +127,7 @@ public class Monitoring implements Serializable {
     public String toString() {
         return "Monitoring{" +
             "id=" + getId() +
-            ", dataJson='" + getDataJson() + "'" +
+            ", value='" + getValue() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             "}";
     }

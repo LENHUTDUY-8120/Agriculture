@@ -31,13 +31,15 @@ public class SeasonCriteria implements Serializable, Criteria {
 
     private IntegerFilter enable;
 
+    private FloatFilter volume;
+
     private StringFilter unit;
 
     private IntegerFilter done;
 
-    private ZonedDateTimeFilter startAt;
+    private LocalDateFilter startAt;
 
-    private ZonedDateTimeFilter endAt;
+    private LocalDateFilter endAt;
 
     private LongFilter transactionId;
 
@@ -55,6 +57,7 @@ public class SeasonCriteria implements Serializable, Criteria {
         this.totalCost = other.totalCost == null ? null : other.totalCost.copy();
         this.cropYields = other.cropYields == null ? null : other.cropYields.copy();
         this.enable = other.enable == null ? null : other.enable.copy();
+        this.volume = other.volume == null ? null : other.volume.copy();
         this.unit = other.unit == null ? null : other.unit.copy();
         this.done = other.done == null ? null : other.done.copy();
         this.startAt = other.startAt == null ? null : other.startAt.copy();
@@ -145,6 +148,21 @@ public class SeasonCriteria implements Serializable, Criteria {
         this.enable = enable;
     }
 
+    public FloatFilter getVolume() {
+        return volume;
+    }
+
+    public FloatFilter volume() {
+        if (volume == null) {
+            volume = new FloatFilter();
+        }
+        return volume;
+    }
+
+    public void setVolume(FloatFilter volume) {
+        this.volume = volume;
+    }
+
     public StringFilter getUnit() {
         return unit;
     }
@@ -175,33 +193,33 @@ public class SeasonCriteria implements Serializable, Criteria {
         this.done = done;
     }
 
-    public ZonedDateTimeFilter getStartAt() {
+    public LocalDateFilter getStartAt() {
         return startAt;
     }
 
-    public ZonedDateTimeFilter startAt() {
+    public LocalDateFilter startAt() {
         if (startAt == null) {
-            startAt = new ZonedDateTimeFilter();
+            startAt = new LocalDateFilter();
         }
         return startAt;
     }
 
-    public void setStartAt(ZonedDateTimeFilter startAt) {
+    public void setStartAt(LocalDateFilter startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTimeFilter getEndAt() {
+    public LocalDateFilter getEndAt() {
         return endAt;
     }
 
-    public ZonedDateTimeFilter endAt() {
+    public LocalDateFilter endAt() {
         if (endAt == null) {
-            endAt = new ZonedDateTimeFilter();
+            endAt = new LocalDateFilter();
         }
         return endAt;
     }
 
-    public void setEndAt(ZonedDateTimeFilter endAt) {
+    public void setEndAt(LocalDateFilter endAt) {
         this.endAt = endAt;
     }
 
@@ -273,6 +291,7 @@ public class SeasonCriteria implements Serializable, Criteria {
             Objects.equals(totalCost, that.totalCost) &&
             Objects.equals(cropYields, that.cropYields) &&
             Objects.equals(enable, that.enable) &&
+            Objects.equals(volume, that.volume) &&
             Objects.equals(unit, that.unit) &&
             Objects.equals(done, that.done) &&
             Objects.equals(startAt, that.startAt) &&
@@ -286,7 +305,22 @@ public class SeasonCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, crops, totalCost, cropYields, enable, unit, done, startAt, endAt, transactionId, cropId, fieldId, distinct);
+        return Objects.hash(
+            id,
+            crops,
+            totalCost,
+            cropYields,
+            enable,
+            volume,
+            unit,
+            done,
+            startAt,
+            endAt,
+            transactionId,
+            cropId,
+            fieldId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -298,6 +332,7 @@ public class SeasonCriteria implements Serializable, Criteria {
             (totalCost != null ? "totalCost=" + totalCost + ", " : "") +
             (cropYields != null ? "cropYields=" + cropYields + ", " : "") +
             (enable != null ? "enable=" + enable + ", " : "") +
+            (volume != null ? "volume=" + volume + ", " : "") +
             (unit != null ? "unit=" + unit + ", " : "") +
             (done != null ? "done=" + done + ", " : "") +
             (startAt != null ? "startAt=" + startAt + ", " : "") +

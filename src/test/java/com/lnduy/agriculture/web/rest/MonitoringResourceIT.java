@@ -1,6 +1,5 @@
 package com.lnduy.agriculture.web.rest;
 
-import static com.lnduy.agriculture.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -14,10 +13,8 @@ import com.lnduy.agriculture.repository.MonitoringRepository;
 import com.lnduy.agriculture.service.criteria.MonitoringCriteria;
 import com.lnduy.agriculture.service.dto.MonitoringDTO;
 import com.lnduy.agriculture.service.mapper.MonitoringMapper;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,9 +39,9 @@ class MonitoringResourceIT {
     private static final String DEFAULT_DATA_JSON = "AAAAAAAAAA";
     private static final String UPDATED_DATA_JSON = "BBBBBBBBBB";
 
-    private static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final LocalDate DEFAULT_CREATED_AT = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_CREATED_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_CREATED_AT = LocalDate.ofEpochDay(-1L);
 
     private static final String ENTITY_API_URL = "/api/monitorings";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -143,7 +140,7 @@ class MonitoringResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(monitoring.getId().intValue())))
             .andExpect(jsonPath("$.[*].dataJson").value(hasItem(DEFAULT_DATA_JSON)))
-            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
     }
 
     @Test
@@ -159,7 +156,7 @@ class MonitoringResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(monitoring.getId().intValue()))
             .andExpect(jsonPath("$.dataJson").value(DEFAULT_DATA_JSON))
-            .andExpect(jsonPath("$.createdAt").value(sameInstant(DEFAULT_CREATED_AT)));
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()));
     }
 
     @Test
@@ -392,7 +389,7 @@ class MonitoringResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(monitoring.getId().intValue())))
             .andExpect(jsonPath("$.[*].dataJson").value(hasItem(DEFAULT_DATA_JSON)))
-            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
 
         // Check, that the count call also returns 1
         restMonitoringMockMvc

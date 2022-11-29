@@ -1,8 +1,10 @@
 package com.lnduy.agriculture.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -36,7 +38,7 @@ public class Season implements Serializable {
     private Integer enable;
 
     @Column(name = "volume")
-    private float volume;
+    private Float volume;
 
     @Column(name = "unit")
     private String unit;
@@ -44,11 +46,12 @@ public class Season implements Serializable {
     @Column(name = "done")
     private Integer done;
 
+    @CreatedDate
     @Column(name = "start_at")
-    private ZonedDateTime startAt;
+    private LocalDate startAt;
 
     @Column(name = "end_at")
-    private ZonedDateTime endAt;
+    private LocalDate endAt;
 
     @OneToMany(mappedBy = "season")
     @JsonIgnoreProperties(value = { "season" }, allowSetters = true)
@@ -129,25 +132,25 @@ public class Season implements Serializable {
         this.enable = enable;
     }
 
+    public Float getVolume() {
+        return this.volume;
+    }
+
+    public Season volume(Float volume) {
+        this.setVolume(volume);
+        return this;
+    }
+
+    public void setVolume(Float volume) {
+        this.volume = volume;
+    }
+
     public String getUnit() {
         return this.unit;
     }
 
     public Season unit(String unit) {
         this.setUnit(unit);
-        return this;
-    }
-
-    public float getVolume() {
-        return volume;
-    }
-
-    public void setVolume(float volume) {
-        this.volume = volume;
-    }
-
-    public Season unit(float volume) {
-        this.setVolume(volume);
         return this;
     }
 
@@ -168,29 +171,29 @@ public class Season implements Serializable {
         this.done = done;
     }
 
-    public ZonedDateTime getStartAt() {
+    public LocalDate getStartAt() {
         return this.startAt;
     }
 
-    public Season startAt(ZonedDateTime startAt) {
+    public Season startAt(LocalDate startAt) {
         this.setStartAt(startAt);
         return this;
     }
 
-    public void setStartAt(ZonedDateTime startAt) {
+    public void setStartAt(LocalDate startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTime getEndAt() {
+    public LocalDate getEndAt() {
         return this.endAt;
     }
 
-    public Season endAt(ZonedDateTime endAt) {
+    public Season endAt(LocalDate endAt) {
         this.setEndAt(endAt);
         return this;
     }
 
-    public void setEndAt(ZonedDateTime endAt) {
+    public void setEndAt(LocalDate endAt) {
         this.endAt = endAt;
     }
 
@@ -279,6 +282,7 @@ public class Season implements Serializable {
             ", totalCost=" + getTotalCost() +
             ", cropYields=" + getCropYields() +
             ", enable=" + getEnable() +
+            ", volume=" + getVolume() +
             ", unit='" + getUnit() + "'" +
             ", done=" + getDone() +
             ", startAt='" + getStartAt() + "'" +

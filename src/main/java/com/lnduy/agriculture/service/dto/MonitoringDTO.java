@@ -1,7 +1,7 @@
 package com.lnduy.agriculture.service.dto;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -12,9 +12,9 @@ public class MonitoringDTO implements Serializable {
 
     private Long id;
 
-    private String dataJson;
+    private Double value;
 
-    private ZonedDateTime createdAt;
+    private LocalDate createdAt;
 
     private FieldDTO field;
 
@@ -28,19 +28,19 @@ public class MonitoringDTO implements Serializable {
         this.id = id;
     }
 
-    public String getDataJson() {
-        return dataJson;
+    public Double getValue() {
+        return value;
     }
 
-    public void setDataJson(String dataJson) {
-        this.dataJson = dataJson;
+    public void setValue(Double value) {
+        this.value = value;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -86,7 +86,7 @@ public class MonitoringDTO implements Serializable {
     public String toString() {
         return "MonitoringDTO{" +
             "id=" + getId() +
-            ", dataJson='" + getDataJson() + "'" +
+            ", value='" + getValue() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", field=" + getField() +
             ", device=" + getDevice() +

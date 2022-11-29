@@ -6,14 +6,6 @@
   "entityTableName": "event",
   "fields": [
     {
-      "fieldName": "startDate",
-      "fieldType": "ZonedDateTime"
-    },
-    {
-      "fieldName": "endDate",
-      "fieldType": "ZonedDateTime"
-    },
-    {
       "fieldName": "title",
       "fieldType": "String"
     },
@@ -27,11 +19,11 @@
     },
     {
       "fieldName": "startAt",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     },
     {
       "fieldName": "endAt",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     }
   ],
   "fluentMethods": true,

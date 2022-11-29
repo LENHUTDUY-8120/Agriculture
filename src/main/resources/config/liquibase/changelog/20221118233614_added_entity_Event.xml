@@ -14,12 +14,6 @@
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="start_date" type="${datetimeType}">
-                <constraints nullable="true" />
-            </column>
-            <column name="end_date" type="${datetimeType}">
-                <constraints nullable="true" />
-            </column>
             <column name="title" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -29,10 +23,10 @@
             <column name="content" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="start_at" type="${datetimeType}">
+            <column name="start_at" type="date">
                 <constraints nullable="true" />
             </column>
-            <column name="end_at" type="${datetimeType}">
+            <column name="end_at" type="date">
                 <constraints nullable="true" />
             </column>
             <column name="category_id" type="bigint">
@@ -40,10 +34,6 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="event" columnName="start_date" columnDataType="${datetimeType}"/>
-        <dropDefaultValue tableName="event" columnName="end_date" columnDataType="${datetimeType}"/>
-        <dropDefaultValue tableName="event" columnName="start_at" columnDataType="${datetimeType}"/>
-        <dropDefaultValue tableName="event" columnName="end_at" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -63,8 +53,6 @@
                   tableName="event"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="start_date" type="date"/>
-            <column name="end_date" type="date"/>
             <column name="title" type="string"/>
             <column name="descriptions" type="string"/>
             <column name="content" type="string"/>

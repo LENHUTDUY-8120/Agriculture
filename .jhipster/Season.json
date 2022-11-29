@@ -22,6 +22,10 @@
       "fieldType": "Integer"
     },
     {
+      "fieldName": "volume",
+      "fieldType": "Float"
+    },
+    {
       "fieldName": "unit",
       "fieldType": "String"
     },
@@ -31,11 +35,11 @@
     },
     {
       "fieldName": "startAt",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     },
     {
       "fieldName": "endAt",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     }
   ],
   "fluentMethods": true,

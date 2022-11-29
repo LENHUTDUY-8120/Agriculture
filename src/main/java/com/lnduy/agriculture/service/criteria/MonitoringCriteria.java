@@ -23,9 +23,9 @@ public class MonitoringCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private StringFilter dataJson;
+    private DoubleFilter value;
 
-    private ZonedDateTimeFilter createdAt;
+    private LocalDateFilter createdAt;
 
     private LongFilter fieldId;
 
@@ -37,7 +37,7 @@ public class MonitoringCriteria implements Serializable, Criteria {
 
     public MonitoringCriteria(MonitoringCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
-        this.dataJson = other.dataJson == null ? null : other.dataJson.copy();
+        this.value = other.value == null ? null : other.value.copy();
         this.createdAt = other.createdAt == null ? null : other.createdAt.copy();
         this.fieldId = other.fieldId == null ? null : other.fieldId.copy();
         this.deviceId = other.deviceId == null ? null : other.deviceId.copy();
@@ -64,33 +64,33 @@ public class MonitoringCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getDataJson() {
-        return dataJson;
+    public DoubleFilter getValue() {
+        return value;
     }
 
-    public StringFilter dataJson() {
-        if (dataJson == null) {
-            dataJson = new StringFilter();
+    public void setValue(DoubleFilter value) {
+        this.value = value;
+    }
+
+    public DoubleFilter value() {
+        if (value == null) {
+            value = new DoubleFilter();
         }
-        return dataJson;
+        return value;
     }
 
-    public void setDataJson(StringFilter dataJson) {
-        this.dataJson = dataJson;
-    }
-
-    public ZonedDateTimeFilter getCreatedAt() {
+    public LocalDateFilter getCreatedAt() {
         return createdAt;
     }
 
-    public ZonedDateTimeFilter createdAt() {
+    public LocalDateFilter createdAt() {
         if (createdAt == null) {
-            createdAt = new ZonedDateTimeFilter();
+            createdAt = new LocalDateFilter();
         }
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTimeFilter createdAt) {
+    public void setCreatedAt(LocalDateFilter createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -143,7 +143,7 @@ public class MonitoringCriteria implements Serializable, Criteria {
         final MonitoringCriteria that = (MonitoringCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(dataJson, that.dataJson) &&
+            Objects.equals(value, that.value) &&
             Objects.equals(createdAt, that.createdAt) &&
             Objects.equals(fieldId, that.fieldId) &&
             Objects.equals(deviceId, that.deviceId) &&
@@ -153,7 +153,7 @@ public class MonitoringCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dataJson, createdAt, fieldId, deviceId, distinct);
+        return Objects.hash(id, value, createdAt, fieldId, deviceId, distinct);
     }
 
     // prettier-ignore
@@ -161,7 +161,7 @@ public class MonitoringCriteria implements Serializable, Criteria {
     public String toString() {
         return "MonitoringCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
-            (dataJson != null ? "dataJson=" + dataJson + ", " : "") +
+            (value != null ? "value=" + value + ", " : "") +
             (createdAt != null ? "createdAt=" + createdAt + ", " : "") +
             (fieldId != null ? "fieldId=" + fieldId + ", " : "") +
             (deviceId != null ? "deviceId=" + deviceId + ", " : "") +

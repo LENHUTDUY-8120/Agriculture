@@ -23,19 +23,15 @@ public class EventCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private ZonedDateTimeFilter startDate;
-
-    private ZonedDateTimeFilter endDate;
-
     private StringFilter title;
 
     private StringFilter descriptions;
 
     private StringFilter content;
 
-    private ZonedDateTimeFilter startAt;
+    private LocalDateFilter startAt;
 
-    private ZonedDateTimeFilter endAt;
+    private LocalDateFilter endAt;
 
     private LongFilter categoryId;
 
@@ -45,8 +41,6 @@ public class EventCriteria implements Serializable, Criteria {
 
     public EventCriteria(EventCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
-        this.startDate = other.startDate == null ? null : other.startDate.copy();
-        this.endDate = other.endDate == null ? null : other.endDate.copy();
         this.title = other.title == null ? null : other.title.copy();
         this.descriptions = other.descriptions == null ? null : other.descriptions.copy();
         this.content = other.content == null ? null : other.content.copy();
@@ -74,36 +68,6 @@ public class EventCriteria implements Serializable, Criteria {
 
     public void setId(LongFilter id) {
         this.id = id;
-    }
-
-    public ZonedDateTimeFilter getStartDate() {
-        return startDate;
-    }
-
-    public ZonedDateTimeFilter startDate() {
-        if (startDate == null) {
-            startDate = new ZonedDateTimeFilter();
-        }
-        return startDate;
-    }
-
-    public void setStartDate(ZonedDateTimeFilter startDate) {
-        this.startDate = startDate;
-    }
-
-    public ZonedDateTimeFilter getEndDate() {
-        return endDate;
-    }
-
-    public ZonedDateTimeFilter endDate() {
-        if (endDate == null) {
-            endDate = new ZonedDateTimeFilter();
-        }
-        return endDate;
-    }
-
-    public void setEndDate(ZonedDateTimeFilter endDate) {
-        this.endDate = endDate;
     }
 
     public StringFilter getTitle() {
@@ -151,33 +115,33 @@ public class EventCriteria implements Serializable, Criteria {
         this.content = content;
     }
 
-    public ZonedDateTimeFilter getStartAt() {
+    public LocalDateFilter getStartAt() {
         return startAt;
     }
 
-    public ZonedDateTimeFilter startAt() {
+    public LocalDateFilter startAt() {
         if (startAt == null) {
-            startAt = new ZonedDateTimeFilter();
+            startAt = new LocalDateFilter();
         }
         return startAt;
     }
 
-    public void setStartAt(ZonedDateTimeFilter startAt) {
+    public void setStartAt(LocalDateFilter startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTimeFilter getEndAt() {
+    public LocalDateFilter getEndAt() {
         return endAt;
     }
 
-    public ZonedDateTimeFilter endAt() {
+    public LocalDateFilter endAt() {
         if (endAt == null) {
-            endAt = new ZonedDateTimeFilter();
+            endAt = new LocalDateFilter();
         }
         return endAt;
     }
 
-    public void setEndAt(ZonedDateTimeFilter endAt) {
+    public void setEndAt(LocalDateFilter endAt) {
         this.endAt = endAt;
     }
 
@@ -215,8 +179,6 @@ public class EventCriteria implements Serializable, Criteria {
         final EventCriteria that = (EventCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(startDate, that.startDate) &&
-            Objects.equals(endDate, that.endDate) &&
             Objects.equals(title, that.title) &&
             Objects.equals(descriptions, that.descriptions) &&
             Objects.equals(content, that.content) &&
@@ -229,7 +191,7 @@ public class EventCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startDate, endDate, title, descriptions, content, startAt, endAt, categoryId, distinct);
+        return Objects.hash(id, title, descriptions, content, startAt, endAt, categoryId, distinct);
     }
 
     // prettier-ignore
@@ -237,8 +199,6 @@ public class EventCriteria implements Serializable, Criteria {
     public String toString() {
         return "EventCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
-            (startDate != null ? "startDate=" + startDate + ", " : "") +
-            (endDate != null ? "endDate=" + endDate + ", " : "") +
             (title != null ? "title=" + title + ", " : "") +
             (descriptions != null ? "descriptions=" + descriptions + ", " : "") +
             (content != null ? "content=" + content + ", " : "") +

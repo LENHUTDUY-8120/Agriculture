@@ -2,9 +2,11 @@ package com.lnduy.agriculture.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
 import javax.persistence.*;
 
 /**
@@ -32,11 +34,14 @@ public class Task implements Serializable {
     @Column(name = "enable")
     private Integer enable;
 
+    @Column(name = "loop")
+    private String loop;
+
     @Column(name = "start_date")
-    private ZonedDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private ZonedDateTime endDate;
+    private LocalDate endDate;
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "transactions", "crop", "field" }, allowSetters = true)
@@ -102,6 +107,19 @@ public class Task implements Serializable {
         return this;
     }
 
+    public String getLoop() {
+        return loop;
+    }
+
+    public void setLoop(String loop) {
+        this.loop = loop;
+    }
+
+    public Task loop(String loop) {
+        this.setLoop(loop);
+        return this;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -132,29 +150,29 @@ public class Task implements Serializable {
         this.enable = enable;
     }
 
-    public ZonedDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return this.startDate;
     }
 
-    public Task startDate(ZonedDateTime startDate) {
+    public Task startDate(LocalDate startDate) {
         this.setStartDate(startDate);
         return this;
     }
 
-    public void setStartDate(ZonedDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public ZonedDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return this.endDate;
     }
 
-    public Task endDate(ZonedDateTime endDate) {
+    public Task endDate(LocalDate endDate) {
         this.setEndDate(endDate);
         return this;
     }
 
-    public void setEndDate(ZonedDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

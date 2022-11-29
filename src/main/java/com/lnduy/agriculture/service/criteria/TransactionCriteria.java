@@ -31,7 +31,7 @@ public class TransactionCriteria implements Serializable, Criteria {
 
     private StringFilter descriptions;
 
-    private ZonedDateTimeFilter createdAt;
+    private LocalDateFilter createdAt;
 
     private LongFilter seasonId;
 
@@ -130,18 +130,18 @@ public class TransactionCriteria implements Serializable, Criteria {
         this.descriptions = descriptions;
     }
 
-    public ZonedDateTimeFilter getCreatedAt() {
+    public LocalDateFilter getCreatedAt() {
         return createdAt;
     }
 
-    public ZonedDateTimeFilter createdAt() {
+    public LocalDateFilter createdAt() {
         if (createdAt == null) {
-            createdAt = new ZonedDateTimeFilter();
+            createdAt = new LocalDateFilter();
         }
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTimeFilter createdAt) {
+    public void setCreatedAt(LocalDateFilter createdAt) {
         this.createdAt = createdAt;
     }
 

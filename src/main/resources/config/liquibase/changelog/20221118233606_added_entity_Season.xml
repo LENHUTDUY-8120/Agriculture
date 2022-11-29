@@ -26,16 +26,19 @@
             <column name="enable" type="integer">
                 <constraints nullable="true" />
             </column>
+            <column name="volume" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
             <column name="unit" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="done" type="integer">
                 <constraints nullable="true" />
             </column>
-            <column name="start_at" type="${datetimeType}">
+            <column name="start_at" type="date">
                 <constraints nullable="true" />
             </column>
-            <column name="end_at" type="${datetimeType}">
+            <column name="end_at" type="date">
                 <constraints nullable="true" />
             </column>
             <column name="crop_id" type="bigint">
@@ -46,8 +49,6 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="season" columnName="start_at" columnDataType="${datetimeType}"/>
-        <dropDefaultValue tableName="season" columnName="end_at" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -71,6 +72,7 @@
             <column name="total_cost" type="numeric"/>
             <column name="crop_yields" type="numeric"/>
             <column name="enable" type="numeric"/>
+            <column name="volume" type="numeric"/>
             <column name="unit" type="string"/>
             <column name="done" type="numeric"/>
             <column name="start_at" type="date"/>

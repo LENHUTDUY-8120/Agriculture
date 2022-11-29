@@ -2,7 +2,8 @@ package com.lnduy.agriculture.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,9 +23,11 @@ public class TaskDTO implements Serializable {
 
     private Integer enable;
 
-    private ZonedDateTime startDate;
+    private String loop;
 
-    private ZonedDateTime endDate;
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     private SeasonDTO season;
 
@@ -68,19 +71,27 @@ public class TaskDTO implements Serializable {
         this.enable = enable;
     }
 
-    public ZonedDateTime getStartDate() {
+    public String getLoop() {
+        return loop;
+    }
+
+    public void setLoop(String loop) {
+        this.loop = loop;
+    }
+
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(ZonedDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public ZonedDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(ZonedDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

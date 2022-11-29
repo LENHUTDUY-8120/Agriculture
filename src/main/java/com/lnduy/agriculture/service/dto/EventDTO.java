@@ -1,7 +1,7 @@
 package com.lnduy.agriculture.service.dto;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -12,19 +12,15 @@ public class EventDTO implements Serializable {
 
     private Long id;
 
-    private ZonedDateTime startDate;
-
-    private ZonedDateTime endDate;
-
     private String title;
 
     private String descriptions;
 
     private String content;
 
-    private ZonedDateTime startAt;
+    private LocalDate startAt;
 
-    private ZonedDateTime endAt;
+    private LocalDate endAt;
 
     private EventCategoryDTO category;
 
@@ -34,22 +30,6 @@ public class EventDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ZonedDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(ZonedDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public ZonedDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(ZonedDateTime endDate) {
-        this.endDate = endDate;
     }
 
     public String getTitle() {
@@ -76,19 +56,19 @@ public class EventDTO implements Serializable {
         this.content = content;
     }
 
-    public ZonedDateTime getStartAt() {
+    public LocalDate getStartAt() {
         return startAt;
     }
 
-    public void setStartAt(ZonedDateTime startAt) {
+    public void setStartAt(LocalDate startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTime getEndAt() {
+    public LocalDate getEndAt() {
         return endAt;
     }
 
-    public void setEndAt(ZonedDateTime endAt) {
+    public void setEndAt(LocalDate endAt) {
         this.endAt = endAt;
     }
 
@@ -126,8 +106,6 @@ public class EventDTO implements Serializable {
     public String toString() {
         return "EventDTO{" +
             "id=" + getId() +
-            ", startDate='" + getStartDate() + "'" +
-            ", endDate='" + getEndDate() + "'" +
             ", title='" + getTitle() + "'" +
             ", descriptions='" + getDescriptions() + "'" +
             ", content='" + getContent() + "'" +

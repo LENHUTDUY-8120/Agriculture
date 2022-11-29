@@ -23,7 +23,7 @@
     },
     {
       "fieldName": "createdAt",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     }
   ],
   "fluentMethods": true,

@@ -11,7 +11,7 @@ entity Field {
 
 entity Monitoring {
 	dataJson String,
-	createdAt ZonedDateTime,
+	createdAt LocalDate,
 }
 
 entity Season {
@@ -19,10 +19,11 @@ entity Season {
     totalCost Double,
     cropYields Double,
     enable Integer,
+    volume Float,
     unit String,
     done Integer,
-    startAt ZonedDateTime,
-    endAt ZonedDateTime,
+    startAt LocalDate,
+    endAt LocalDate,
 }
 
 entity SoilType {
@@ -89,13 +90,11 @@ entity DeviceCategory {
 }
 
 entity Event {
-	startDate ZonedDateTime,
-    endDate ZonedDateTime,
     title String,
     descriptions String,
     content String,
-    startAt ZonedDateTime,
-    endAt ZonedDateTime,
+    startAt LocalDate,
+    endAt LocalDate,
 }
 
 entity EventCategory {
@@ -110,8 +109,8 @@ entity Task {
 	title String,
 	description String,
     enable Integer,
-    startDate ZonedDateTime,
-    endDate ZonedDateTime
+    startDate LocalDate,
+    endDate LocalDate
 }
 
 entity Employee {
@@ -130,7 +129,7 @@ entity Transaction {
   	price BigDecimal,
     type String,
     descriptions String,
-    createdAt ZonedDateTime,
+    createdAt LocalDate,
 }
 
 // defining multiple OneToMany relationships with comments

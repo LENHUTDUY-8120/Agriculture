@@ -19,11 +19,11 @@
     },
     {
       "fieldName": "startDate",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     },
     {
       "fieldName": "endDate",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "LocalDate"
     }
   ],
   "fluentMethods": true,

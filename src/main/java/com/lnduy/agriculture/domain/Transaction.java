@@ -3,7 +3,7 @@ package com.lnduy.agriculture.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import javax.persistence.*;
 
 /**
@@ -35,7 +35,7 @@ public class Transaction implements Serializable {
     private String descriptions;
 
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private LocalDate createdAt;
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "transactions", "crop", "field" }, allowSetters = true)
@@ -108,16 +108,16 @@ public class Transaction implements Serializable {
         this.descriptions = descriptions;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return this.createdAt;
     }
 
-    public Transaction createdAt(ZonedDateTime createdAt) {
+    public Transaction createdAt(LocalDate createdAt) {
         this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 

@@ -54,7 +54,7 @@ public class Field implements Serializable {
     @JsonIgnoreProperties(value = { "category", "field" }, allowSetters = true)
     private Set<Device> devices = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private SoilType soil;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -90,8 +90,8 @@ public class MonitoringQueryService extends QueryService<Monitoring> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), Monitoring_.id));
             }
-            if (criteria.getDataJson() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getDataJson(), Monitoring_.dataJson));
+            if (criteria.getValue() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getValue(), Monitoring_.value));
             }
             if (criteria.getCreatedAt() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getCreatedAt(), Monitoring_.createdAt));

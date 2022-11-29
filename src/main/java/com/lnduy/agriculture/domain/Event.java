@@ -1,7 +1,7 @@
 package com.lnduy.agriculture.domain;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import javax.persistence.*;
 
 /**
@@ -20,12 +20,6 @@ public class Event implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "start_date")
-    private ZonedDateTime startDate;
-
-    @Column(name = "end_date")
-    private ZonedDateTime endDate;
-
     @Column(name = "title")
     private String title;
 
@@ -36,10 +30,10 @@ public class Event implements Serializable {
     private String content;
 
     @Column(name = "start_at")
-    private ZonedDateTime startAt;
+    private LocalDate startAt;
 
     @Column(name = "end_at")
-    private ZonedDateTime endAt;
+    private LocalDate endAt;
 
     @ManyToOne
     private EventCategory category;
@@ -57,32 +51,6 @@ public class Event implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ZonedDateTime getStartDate() {
-        return this.startDate;
-    }
-
-    public Event startDate(ZonedDateTime startDate) {
-        this.setStartDate(startDate);
-        return this;
-    }
-
-    public void setStartDate(ZonedDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public ZonedDateTime getEndDate() {
-        return this.endDate;
-    }
-
-    public Event endDate(ZonedDateTime endDate) {
-        this.setEndDate(endDate);
-        return this;
-    }
-
-    public void setEndDate(ZonedDateTime endDate) {
-        this.endDate = endDate;
     }
 
     public String getTitle() {
@@ -124,29 +92,29 @@ public class Event implements Serializable {
         this.content = content;
     }
 
-    public ZonedDateTime getStartAt() {
+    public LocalDate getStartAt() {
         return this.startAt;
     }
 
-    public Event startAt(ZonedDateTime startAt) {
+    public Event startAt(LocalDate startAt) {
         this.setStartAt(startAt);
         return this;
     }
 
-    public void setStartAt(ZonedDateTime startAt) {
+    public void setStartAt(LocalDate startAt) {
         this.startAt = startAt;
     }
 
-    public ZonedDateTime getEndAt() {
+    public LocalDate getEndAt() {
         return this.endAt;
     }
 
-    public Event endAt(ZonedDateTime endAt) {
+    public Event endAt(LocalDate endAt) {
         this.setEndAt(endAt);
         return this;
     }
 
-    public void setEndAt(ZonedDateTime endAt) {
+    public void setEndAt(LocalDate endAt) {
         this.endAt = endAt;
     }
 
@@ -187,8 +155,6 @@ public class Event implements Serializable {
     public String toString() {
         return "Event{" +
             "id=" + getId() +
-            ", startDate='" + getStartDate() + "'" +
-            ", endDate='" + getEndDate() + "'" +
             ", title='" + getTitle() + "'" +
             ", descriptions='" + getDescriptions() + "'" +
             ", content='" + getContent() + "'" +

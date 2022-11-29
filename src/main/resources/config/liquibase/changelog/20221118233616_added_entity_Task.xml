@@ -23,10 +23,10 @@
             <column name="enable" type="integer">
                 <constraints nullable="true" />
             </column>
-            <column name="start_date" type="${datetimeType}">
+            <column name="start_date" type="date">
                 <constraints nullable="true" />
             </column>
-            <column name="end_date" type="${datetimeType}">
+            <column name="end_date" type="date">
                 <constraints nullable="true" />
             </column>
             <column name="season_id" type="bigint">
@@ -34,8 +34,6 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="task" columnName="start_date" columnDataType="${datetimeType}"/>
-        <dropDefaultValue tableName="task" columnName="end_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <changeSet id="20221118233616-1-relations" author="jhipster">

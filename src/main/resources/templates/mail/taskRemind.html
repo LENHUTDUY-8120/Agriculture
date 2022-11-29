@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Reminder</title>
+</head>
+<body>
+  <h1>You have a Task today!!!</h1>
+  <h3>Description:</h3>
+  <h4 th:text="${task.getDescription()}"></h4>
+  <h3>Employees:</h3>
+  <th:block th:each="empl : ${employees}">
+    <li th:text="${empl.firstName} +' ' + ${empl.lastName} "></li>
+  </th:block>
+  <h3>Supplies:</h3>
+  <th:block th:each="supp : ${supplies}">
+    <li th:text="${supp.name}"></li>
+  </th:block>
+  <h3>Fertilizers:</h3>
+  <th:block th:each="fert : ${Fertilizers}">
+    <li th:text="${fert.name}"></li>
+  </th:block>
+  <h3>Protection Products:</h3>
+  <th:block th:each="ptp : ${protectionProducts}">
+    <li th:text="${ptp.name}"></li>
+  </th:block>
+</body>
+</html>
